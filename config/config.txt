@@ -68,7 +68,7 @@ LOG_PDA
 ##LOG_ADMINWARN  ## Also duplicates a bunch of other messages.
 
 ## log world.log and runtime errors to a file
-# LOG_RUNTIMES
+ LOG_RUNTIMES
 
 ## sql switching
 # SQL_ENABLED
@@ -159,23 +159,23 @@ GUEST_BAN
 # USEWHITELIST
 
 ## set a server location for world reboot. Don't include the byond://, just give the address and port.
-# SERVER ss13.example.com:2506
+SERVER 51.254.36.149:5456
 
 ## forum address
-# FORUMURL http://example.com
+FORUMURL http://hispanistation.enjin.com/
 
 ## Wiki address
-# WIKIURL http://example.com
+WIKIURL http://ss13.moe/wiki/index.php/Main_Page
 
 ## Ban appeals URL - usually for a forum or wherever people should go to contact your admins.
-# BANAPPEALS http://example.com
+BANAPPEALS http://hispanistation.enjin.com/unban
 
 ## In-game features
 ## spawns a spellbook which gives object-type spells instead of verb-type spells for the wizard
 # FEATURE_OBJECT_SPELL_SYSTEM
 
 ##Toggle for having jobs load up from the .txt
-# LOAD_JOBS_FROM_TXT
+LOAD_JOBS_FROM_TXT
 
 ##Remove the # mark infront of this to forbid admins from posssessing the singularity.
 #FORBID_SINGULO_POSSESSION
@@ -233,7 +233,7 @@ RESPAWN_AS_MOMMI
 #GHOST_INTERACTION
 
 ## Uncomment to use the paperwork library
-#PAPERWORK_LIBRARY
+PAPERWORK_LIBRARY
 
 ## Uncomment to enable sending data to the IRC bot.
 #USE_IRC_BOT
@@ -314,5 +314,5 @@ SKIP_MINIMAP_GENERATION
 ENABLE_WAGES
 
 # HTTP URL to send Discord messages to.
-# DISCORD_URL
+DISCORD_URL https://discordapp.com/channels/154133805429555200/244122312176041984
 # DISCORD_PASSWORD
