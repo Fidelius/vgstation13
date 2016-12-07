@@ -97,57 +97,20 @@ function linkify(text) {
 	});
 }
 
-//Actually turns the highlight term match into appropriate html
-function addHighlightMarkup(match) {
-	var extra = '';
-	if (opts.highlightColor) {
-		extra += ' style="background-color: '+opts.highlightColor+'"';
-	}
-	return '<span class="highlight"'+extra+'>'+match+'</span>';
+// Colorizes the highlight spans
+function setHighlightColor(match) {
+	match.style.background = opts.highlightColor
 }
 
 //Highlights words based on user settings
 function highlightTerms(el) {
-	if (el.children.length > 0) {
-		for(var h = 0; h < el.children.length; h++){
-			highlightTerms(el.children[h]);
+	for (var i = 0; i < opts.highlightTerms.length; i++) { //Each highlight term
+		if(opts.highlightTerms[i]) {
+			$(el).mark(opts.highlightTerms[i], {"element" : "span", "each" : setHighlightColor});
 		}
-	}
-
-	var hasTextNode = false;
-	for (var node = 0; node < el.childNodes.length; node++)
-	{
-		if (el.childNodes[node].nodeType === 3)
-		{
-			hasTextNode = true;
-			break;
-		}
-	}
-
-	if (hasTextNode) { //If element actually has text
-		var newText = '';
-		for (var c = 0; c < el.childNodes.length; c++) { //Each child element
-			if (el.childNodes[c].nodeType === 3) { //Is it text only?
-				var words = el.childNodes[c].data.split(' ');
-				for (var w = 0; w < words.length; w++) { //Each word in the text
-					var newWord = null;
-					for (var i = 0; i < opts.highlightTerms.length; i++) { //Each highlight term
-						if (opts.highlightTerms[i] && words[w].toLowerCase().indexOf(opts.highlightTerms[i].toLowerCase()) > -1) { //If a match is found
-							newWord = words[w].replace("<", "&lt;").replace(new RegExp(opts.highlightTerms[i], 'gi'), addHighlightMarkup);
-							break;
-						}
-						console.log(newWord)
-					}
-					newText += newWord || words[w].replace("<", "&lt;");
-					newText += w >= words.length ? '' : ' ';
-				}
-			} else { //Every other type of element
-				newText += outerHTML(el.childNodes[c]);
-			}
-		}
-		el.innerHTML = newText;
 	}
 }
+
 //Send a message to the client
 function output(message, flag) {
 	if (typeof message === 'undefined') {
