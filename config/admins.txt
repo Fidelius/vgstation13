@@ -7,7 +7,7 @@
 
 Fidelius - Host
 MattDuskson - Host
-PromethTK11 - Trial Admin
+PromethTK11 - Game Admin
 AurumCU - Game Admin
 Hessica - Game Admin
 SirBedrydant - Game Admin
