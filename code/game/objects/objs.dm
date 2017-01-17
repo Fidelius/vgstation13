@@ -48,9 +48,15 @@ var/global/list/reagents_to_log = list(FUEL, PLASMA, PACID, SACID, AMUTATIONTOXI
 	if(src in processing_objects)
 		processing_objects -= src
 
+	if(integratedpai)
+		qdel(integratedpai)
+		integratedpai = null
+		verbs -= /obj/verb/remove_pai
+
 	..()
 
 /obj/item/proc/is_used_on(obj/O, mob/user)
+
 
 /obj/proc/install_pai(obj/item/device/paicard/P)
 	if(!P || !istype(P))
@@ -59,12 +65,21 @@ var/global/list/reagents_to_log = list(FUEL, PLASMA, PACID, SACID, AMUTATIONTOXI
 	integratedpai = P
 	verbs += /obj/verb/remove_pai
 
+
 /obj/attackby(obj/item/weapon/W, mob/user)
 	if(can_take_pai && istype(W, /obj/item/device/paicard))
+		if(integratedpai)
+			to_chat(user, "<span class = 'notice'>There's already a Personal AI inserted.</span>")
+			return
+
 		if(user.drop_item(W))
 			to_chat(user, "You insert \the [W] into a slot in \the [src].")
 			install_pai(W)
+			state_controls_pai(W)
 			playsound(src, 'sound/misc/cartridge_in.ogg', 25)
+
+/obj/proc/state_controls_pai(obj/item/device/paicard/P) //text the pAI receives when is inserted into something. EXAMPLE: to_chat(P.pai, "Welcome to your new body")
+	return
 
 /obj/proc/attack_integrated_pai(mob/living/silicon/pai/user)	//called when integrated pAI clicks on the object, or uses the attack_self() hotkey
 	return
