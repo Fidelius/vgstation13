@@ -26,7 +26,6 @@
 
 	size = SIZE_SMALL
 	meat_type = null
-	held_items = list()
 
 /mob/living/simple_animal/hostile/viscerator/Life()
 	..()

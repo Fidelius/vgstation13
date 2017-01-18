@@ -153,7 +153,6 @@ var/list/diseases = typesof(/datum/disease) - /datum/disease
 
 
 /datum/disease/proc/process()
-	set waitfor = FALSE
 	if(!holder)
 		active_diseases -= src
 		return

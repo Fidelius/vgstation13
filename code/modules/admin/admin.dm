@@ -106,7 +106,6 @@ var/global/floorIsLava = 0
 			<A href='?src=\ref[src];addcancer=\ref[M]'>Inflict Cancer</A> |
 			<A href='?src=\ref[src];makecatbeast=\ref[M]'>Make Catbeast</A> |
 			<A href='?src=\ref[src];makecluwne=\ref[M]'>Make Cluwne</A> |
-			<A href='?src=\ref[src];Assplode=\ref[M]'>Assplode</A> |
 		"}
 
 	// Mob-specific controls.
@@ -192,7 +191,6 @@ var/global/floorIsLava = 0
 				<A href='?src=\ref[src];simplemake=ian;mob=\ref[M]'>Ian</A> |
 				<A href='?src=\ref[src];simplemake=crab;mob=\ref[M]'>Crab</A> |
 				<A href='?src=\ref[src];simplemake=coffee;mob=\ref[M]'>Coffee</A>
-				<A href='?src=\ref[src];simplemake=blob;mob=\ref[M]'>BLOB</A>
 				<br>\[ Silicon: <A href='?src=\ref[src];simplemake=ai;mob=\ref[M]'>AI</A>, |
 				<A href='?src=\ref[src];simplemake=robot;mob=\ref[M]'>Cyborg</A> \]
 				<br>\[ Alien: <A href='?src=\ref[src];simplemake=drone;mob=\ref[M]'>Drone</A>,
@@ -646,7 +644,7 @@ var/global/floorIsLava = 0
 				<BR><A href='?src=\ref[src];ac_setScreen=[0]'>Return</A><BR>
 			"}
 		else
-			dat+="Something bad happened. More accurately, this broke. Please make a bug report."
+			dat+="I'm sorry to break your immersion. This shit's bugged. Report this bug to Agouri, polyxenitopalidou@gmail.com"
 
 //	to_chat(world, "Channelname: [src.admincaster_feed_channel.channel_name] [src.admincaster_feed_channel.author]")
 //	to_chat(world, "Msg: [src.admincaster_feed_message.author] [src.admincaster_feed_message.body]")
@@ -787,13 +785,13 @@ var/global/floorIsLava = 0
 			<BR>
 			<A href='?src=\ref[src];secretsfun=hardcore_mode'>[ticker&&ticker.hardcore_mode ? "Disable" : "Enable"] hardcore mode (makes starvation kill!)</A><BR>
 			<A href='?src=\ref[src];secretsfun=tripleAI'>Triple AI mode (needs to be used in the lobby)</A><BR>
-			<A href='?src=\ref[src];secretsfun=eagles'>Egalitarian Station Mode (removes access on doors except for Command and Security)</A><BR>
+			<A href='?src=\ref[src];secretsfun=eagles'>Egalitarian Station Mode</A><BR>
 			<BR>
 			<A href='?src=\ref[src];secretsfun=power'>Make all areas powered</A><BR>
 			<A href='?src=\ref[src];secretsfun=unpower'>Make all areas unpowered</A><BR>
 			<A href='?src=\ref[src];secretsfun=quickpower'>Power all SMES</A><BR>
 			<A href='?src=\ref[src];secretsfun=breaklink'>Break the station's link with Central Command</A><BR>
-			<A href='?src=\ref[src];secretsfun=makelink'>Fix the station's link with Central Command</A><BR>
+			<A href='?src=\ref[src];secretsfun=makelink'>Make the station linked with Central Command</A><BR>
 			<A href='?src=\ref[src];secretsfun=blackout'>Break all lights</A><BR>
 			<A href='?src=\ref[src];secretsfun=whiteout'>Fix all lights</A><BR>
 			<BR>
@@ -805,25 +803,25 @@ var/global/floorIsLava = 0
 			<A href='?src=\ref[src];secretsfun=striketeam'>Send in a strike team</A><BR>
 			<A href='?src=\ref[src];secretsfun=placeturret'>Create a turret</A><BR>
 			<BR>
-			<A href='?src=\ref[src];secretsfun=traitor_all'>Make everyone traitors</A><BR>
-			<A href='?src=\ref[src];secretsfun=onlyone'>Highlander/Wizard Wars Mode (There can be only one!)</A><BR>
+			<A href='?src=\ref[src];secretsfun=traitor_all'>Everyone is the traitor</A><BR>
+			<A href='?src=\ref[src];secretsfun=onlyone'>There can be only one!</A><BR>
 			<A href='?src=\ref[src];secretsfun=experimentalguns'>Distribute experimental guns to the crew</A><BR>
 			<A href='?src=\ref[src];secretsfun=flicklights'>Ghost Mode</A><BR>
 			<A href='?src=\ref[src];secretsfun=monkey'>Turn all humans into monkeys</A><BR>
 			<BR>
 			<A href='?src=\ref[src];secretsfun=sec_all_clothes'>Remove ALL clothing</A><BR>
 			<A href='?src=\ref[src];secretsfun=retardify'>Make all players retarded</A><BR>
-			<A href='?src=\ref[src];secretsfun=fakeguns'>Make all items look like guns (traitor revolvers)</A><BR>
+			<A href='?src=\ref[src];secretsfun=fakeguns'>Make all items look like guns</A><BR>
 			<A href='?src=\ref[src];secretsfun=schoolgirl'>Japanese Animes Mode</A><BR>
 			<BR>
 			<A href='?src=\ref[src];secretsfun=thebees'>Unleash THE BEES onto the crew</A><BR>
-			<A href='?src=\ref[src];secretsfun=floorlava'>The floor is lava! (WARNING: extremely lame and DANGEROUS!)</A><BR>
+			<A href='?src=\ref[src];secretsfun=floorlava'>The floor is lava! (DANGEROUS: extremely lame)</A><BR>
 			<BR>
-			<A href='?src=\ref[src];secretsfun=massbomber'>Turn all players into Bomberman</A><BR>
+			<A href='?src=\ref[src];secretsfun=massbomber'>Turn every players into Bomberman</A><BR>
 			<A href='?src=\ref[src];secretsfun=bomberhurt'>Make Bomberman Bombs actually hurt players</A><BR>
-			<A href='?src=\ref[src];secretsfun=bomberdestroy'>Make Bomberman Bombs actually destroy structures</A><BR>
-			<A href='?src=\ref[src];secretsfun=bombernohurt'>Make Bomberman Bombs harmless to players (default)</A><BR>
-			<A href='?src=\ref[src];secretsfun=bombernodestroy'>Make Bomberman Bombs harmless to the environment (default)</A><BR>
+			<A href='?src=\ref[src];secretsfun=bomberdestroy'>Make Bomberman Bombs actually destroy stuff</A><BR>
+			<A href='?src=\ref[src];secretsfun=bombernohurt'>Make Bomberman Bombs harmless to players(default)</A><BR>
+			<A href='?src=\ref[src];secretsfun=bombernodestroy'>Make Bomberman Bombs harmless to the environnement(default)</A><BR>
 			<BR>
 			<B>Final Solutions</B><BR>
 			<I>(Warning, these will end the round!)</I><BR>
@@ -1241,7 +1239,7 @@ var/global/floorIsLava = 0
 */
 /datum/admins/proc/spawn_atom(var/object as text)
 	set category = "Debug"
-	set desc = "(atom path) Spawn an atom. Finish path with a period to hide subtypes"
+	set desc = "(atom path) Spawn an atom"
 	set name = "Spawn"
 
 	if(!check_rights(R_SPAWN))
@@ -1249,17 +1247,9 @@ var/global/floorIsLava = 0
 
 	var/list/matches = new()
 
-	if(text_ends_with(object, ".")) //Path ends with a dot - DO NOT include subtypes
-		object = copytext(object, 1, length(object)) //Remove the dot
-
-		for(var/path in typesof(/atom))
-			if(text_ends_with("[path]", object))
-				matches += path
-	else //Include subtypes
-		for(var/path in typesof(/atom))
-			if(findtext("[path]", object))
-				matches += path
-
+	for(var/path in typesof(/atom))
+		if(findtext("[path]", object))
+			matches += path
 
 	if(matches.len==0)
 		return

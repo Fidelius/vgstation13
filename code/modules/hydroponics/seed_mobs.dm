@@ -99,7 +99,8 @@
 	var/newname = input(host,"Enter a name, or leave blank for the default name.", "Name change","") as text
 	newname = copytext(sanitize(newname),1,MAX_NAME_LEN)
 	if (newname != "")
-		host.fully_replace_character_name(newname = newname)
+		host.real_name = newname
+		host.name = host.real_name
 
 /datum/seed/Topic(var/href, var/list/href_list)
 	if(href_list["signup"])

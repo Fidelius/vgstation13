@@ -92,9 +92,9 @@
 	manual_unbuckle(user)
 
 /obj/effect/plantsegment/proc/manual_unbuckle(mob/user as mob)
-	if(is_locking(/datum/locking_category/plantsegment))
+	if(locked_atoms && locked_atoms.len)
 		if(prob(seed ? min(max(0,100 - seed.potency),100) : 50))
-			var/mob/M = get_locked(/datum/locking_category/plantsegment)[1]
+			var/mob/M = locked_atoms[1]
 			if(M != user)
 				M.visible_message(\
 					"<span class='notice'>[user.name] frees [M.name] from \the [src].</span>",\

@@ -110,7 +110,7 @@
 		greet_revolutionary(rev_mind)
 	modePlayer += head_revolutionaries
 	if(emergency_shuttle)
-		emergency_shuttle.always_fake_recall = 0
+		emergency_shuttle.always_fake_recall = 1
 	spawn (rand(waittime_l, waittime_h))
 		if(!mixed)
 			send_intercept()
@@ -145,11 +145,17 @@
 		obj_count++
 
 /////////////////////////////////////////////////////////////////////////////////
-//This are equips the rev heads with their gear//
+//This are equips the rev heads with their gear, and makes the clown not clumsy//
 /////////////////////////////////////////////////////////////////////////////////
 /datum/game_mode/proc/equip_revolutionary(mob/living/carbon/human/mob)
 	if(!istype(mob))
 		return
+
+	if (mob.mind)
+		if (mob.mind.assigned_role == "Clown")
+			to_chat(mob, "Your training has allowed you to overcome your clownish nature, allowing you to wield weapons without harming yourself.")
+			mob.mutations.Remove(M_CLUMSY)
+
 
 	var/obj/item/device/flash/T = new(mob)
 

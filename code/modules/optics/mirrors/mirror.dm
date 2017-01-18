@@ -94,7 +94,7 @@ var/global/list/obj/machinery/mirror/mirror_list = list()
 	if(. == 1)
 		if(beams && beams.len)
 			kill_all_beams()
-		update_beams()
+			update_beams()
 	return .
 
 /obj/machinery/mirror/beam_connect(var/obj/effect/beam/emitter/B)
@@ -133,8 +133,8 @@ var/global/list/obj/machinery/mirror/mirror_list = list()
 	overlays.len = 0
 
 	var/list/beam_dirs[4] // dir = list(
-                        //  type = power
-                        // )
+		                  //  type = power
+		                  // )
 
 	var/i = 0 // Iteration index.
 
@@ -185,23 +185,19 @@ var/global/list/obj/machinery/mirror/mirror_list = list()
 				beam_dirs[diridx]=dirdata
 
 
-	// Ensure our emitted beams list is at the required length
+	// Emit beams.
 	if(emitted_beams.len < 4)
-		emitted_beams.len=4
-
-	var/list/oldebs=emitted_beams.Copy()
-
-	// Emit beams
+		emitted_beams.len = 4
 	for(i=1;i<=4;i++)
 		var/cdir = cardinal[i]
 		var/list/dirdata = beam_dirs[i]
 		var/delbeam=0
 		var/obj/effect/beam/beam
 		if(dirdata.len > 0)
+			//testing("cdir=[cdir]")
 			for(var/beamtype in dirdata)
 				var/newbeam=0
 				beam = emitted_beams[i]
-
 				// If there's a beam and it's changed, nuke the existing beam.
 				if (beam && beam.type != beamtype)
 					qdel(beam)
@@ -215,7 +211,6 @@ var/global/list/obj/machinery/mirror/mirror_list = list()
 					beam.dir=cdir
 					newbeam=1
 
-				// Is it an emitter beam? Update its power.
 				if(istype(beam, /obj/effect/beam/emitter))
 					var/obj/effect/beam/emitter/EB=beam
 					EB.power = dirdata[beamtype]
@@ -230,24 +225,9 @@ var/global/list/obj/machinery/mirror/mirror_list = list()
 				break
 		else // dirdata.len == 0
 			delbeam=1
-
-		// N3X15 Jan 11 2017: GC is deleting shit from the list or something, so we have to ensure size again.
-		// Fix for #12077
-		if(emitted_beams.len < 4)
-			emitted_beams.len=4
-
-		beam = emitted_beams[i] // Crashes here
+		beam = emitted_beams[i] // One last check.
 		if(delbeam && beam)
 			qdel(beam)
 			emitted_beams[i]=null
 
 	overlays += mirror_state
-
-	// Ensure all beams have been cleaned up
-	// Another 12077 fix.
-	for(var/obj/effect/beam/B in oldebs)
-		if(B && !(B in emitted_beams))
-			// Ideally, I'd like to keep this warning to make Pomf bug Lummox,
-			// but the spam would just piss everyone off.
-			//testing("BUG: Beam \ref[B] is still around after getting deleted!")
-			qdel(B)

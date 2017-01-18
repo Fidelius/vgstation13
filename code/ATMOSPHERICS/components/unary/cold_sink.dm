@@ -5,7 +5,7 @@
 	use_power = 1
 
 	name = "Cold Sink"
-	desc = "Cools gases when connected to a pipe network."
+	desc = "Cools gas when connected to pipe network"
 
 	var/on = 0
 

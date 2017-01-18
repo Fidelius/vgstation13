@@ -238,12 +238,11 @@
 		return
 	//for(var/obj/O in src)
 	//	O.loc = src.loc
-	if(!occupant.gcDestroyed)
-		if (occupant.client)
-			occupant.client.eye = occupant.client.mob
-			occupant.client.perspective = MOB_PERSPECTIVE
-		occupant.forceMove(src.loc)
-	occupant = null
+	if (src.occupant.client)
+		src.occupant.client.eye = src.occupant.client.mob
+		src.occupant.client.perspective = MOB_PERSPECTIVE
+	src.occupant.forceMove(src.loc)
+	src.occupant = null
 	build_icon()
 	src.use_power = 1
 	// Removes dropped items/magically appearing mobs from the charger too

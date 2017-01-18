@@ -38,10 +38,10 @@ var/list/blob_looks
 
 /obj/effect/blob
 	name = "blob"
-	icon = 'icons/mob/blob/blob_64x64.dmi'
+	icon = 'icons/mob/blob_64x64.dmi'
 	icon_state = "center"
 	luminosity = 2
-	desc = "A part of a blob."
+	desc = "Some blob creature thingy"
 	density = 0 //Necessary for spore pathfinding
 	opacity = 0
 	anchored = 1
@@ -53,7 +53,6 @@ var/list/blob_looks
 	var/fire_resist = 1
 	pixel_x = -WORLD_ICON_SIZE/2
 	pixel_y = -WORLD_ICON_SIZE/2
-	layer = BLOB_BASE_LAYER
 	plane = BLOB_PLANE
 	var/spawning = 2
 	var/dying = 0
@@ -71,7 +70,6 @@ var/list/blob_looks
 	var/icon_classic = "blob"
 
 	var/manual_remove = 0
-	var/icon_size = 64
 
 /obj/effect/blob/blob_act()
 	return
@@ -89,7 +87,7 @@ var/list/blob_looks
 	src.dir = pick(cardinal)
 	time_since_last_pulse = world.time
 
-	if(icon_size == 64)
+	if(blob_looks[looks] == 64)
 		if(spawning && !no_morph)
 			icon_state = initial(icon_state) + "_spawn"
 			spawn(10)
@@ -112,7 +110,7 @@ var/list/blob_looks
 	dying = 1
 	blobs -= src
 
-	if(icon_size == 64)
+	if(blob_looks[looks] == 64)
 		for(var/atom/movable/overlay/O in loc)
 			returnToPool(O)
 
@@ -232,7 +230,7 @@ var/list/blob_looks
 	return
 
 /obj/effect/blob/update_icon(var/spawnend = 0)
-	if(icon_size == 64)
+	if(blob_looks[looks] == 64)
 		if(health < maxhealth)
 			var/hurt_percentage = round((health * 100) / maxhealth)
 			var/hurt_icon
@@ -248,10 +246,9 @@ var/list/blob_looks
 			overlays += image(icon,hurt_icon)
 
 /obj/effect/blob/proc/update_looks(var/right_now = 0)
-	switch(blob_looks_admin[looks]) //blob_looks_admin should have every possible blob skin
+	switch(blob_looks[looks])
 		if(64)
 			icon_state = icon_new
-			icon_size = 64
 			pixel_x = -WORLD_ICON_SIZE/2
 			pixel_y = -WORLD_ICON_SIZE/2
 			layer = initial(layer)
@@ -259,7 +256,6 @@ var/list/blob_looks
 				spawning = 0
 		if(32)
 			icon_state = icon_classic
-			icon_size = 32
 			pixel_x = 0
 			pixel_y = 0
 			layer = OBJ_LAYER
@@ -267,17 +263,11 @@ var/list/blob_looks
 
 	switch(looks)
 		if("new")
-			icon = 'icons/mob/blob/blob_64x64.dmi'
+			icon = 'icons/mob/blob_64x64.dmi'
 		if("classic")
-			icon = 'icons/mob/blob/blob.dmi'
+			icon = 'icons/mob/blob.dmi'
 		if("adminbus")
 			icon = adminblob_icon
-		if("clownscape")
-			icon = 'icons/mob/blob/blob_honkscape.dmi'
-		if("AME")
-			icon = 'icons/mob/blob/blob_AME.dmi'
-		if("AME_new")
-			icon = 'icons/mob/blob/blob_AME_64x64.dmi'
 		//<----------------------------------------------------------------------------DEAR SPRITERS, THIS IS WHERE YOU ADD YOUR NEW BLOB DMIs
 		/*EXAMPLES
 		if("fleshy")
@@ -289,18 +279,10 @@ var/list/blob_looks
 	if(right_now)
 		update_icon()
 
-var/list/blob_looks_admin = list(//Options available to admins
+var/list/blob_looks = list(
 	"new" = 64,
 	"classic" = 32,
 	"adminbus" = adminblob_size,
-	"clownscape" = 32,
-	"AME" = 32,
-	"AME_new" = 64,
-	)
-
-var/list/blob_looks_player = list(//Options available to players
-	"new" = 64,
-	"classic" = 32,
 	)
 	//<---------------------------------------ALSO ADD THE NAME OF YOUR BLOB LOOKS HERE, AS WELL AS THE RESOLUTION OF THE DMIS (64 or 32)
 
@@ -376,7 +358,7 @@ var/list/blob_looks_player = list(//Options available to players
 	var/obj/effect/blob/normal/B = new(src.loc, newlook = looks)
 	B.density = 1
 
-	if(icon_size == 64)
+	if(blob_looks[looks] == 64)
 		if(istype(src,/obj/effect/blob/normal))
 			var/num = rand(1,100)
 			num /= 10000
@@ -384,9 +366,8 @@ var/list/blob_looks_player = list(//Options available to players
 
 	if(T.Enter(B,src))//Attempt to move into the tile
 		B.density = initial(B.density)
-		if(icon_size == 64)
+		if(blob_looks[looks] == 64)
 			spawn(1)
-				B.dir = get_dir(loc,T)
 				B.forceMove(T)
 				B.aftermove()
 				if(B.spawning > 1)
@@ -409,8 +390,7 @@ var/list/blob_looks_player = list(//Options available to players
 	if("[type]" == "/obj/effect/blob/core")
 		new type(src.loc, 200, null, 1, M, newlook = looks)
 	else
-		var/obj/effect/blob/B = new type(src.loc, newlook = looks)
-		B.dir = dir
+		new type(src.loc, newlook = looks)
 	spawning = 1//so we don't show red severed connections
 	manual_remove = 1
 	Delete()
@@ -430,18 +410,17 @@ var/list/blob_looks_player = list(//Options available to players
 /obj/effect/blob/normal
 	luminosity = 2
 	health = 21
-	layer = BLOB_BASE_LAYER
 
 /obj/effect/blob/normal/Delete()
 	..()
-/*
+
 /obj/effect/blob/normal/Pulse(var/pulse = 0, var/origin_dir = 0)
 	..()
-	if(icon_size == 64)
+	if(blob_looks[looks] == 64)
 		anim(target = loc, a_icon = icon, flick_anim = "pulse", sleeptime = 15, direction = dir, lay = 12, offX = -16, offY = -16, alph = 51)
-*/
+
 /obj/effect/blob/normal/update_icon(var/spawnend = 0)
-	if(icon_size == 64)
+	if(blob_looks[looks] == 64)
 		spawn(1)
 			overlays.len = 0
 			underlays.len = 0

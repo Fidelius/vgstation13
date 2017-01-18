@@ -122,10 +122,12 @@
 				return TRUE
 
 			if(user.drop_item(O, src))
-				makeMoMMI(mmi.brainmob, mmi)
+				mmi.icon = null
+				mmi.invisibility = 101
+				makeMoMMI(mmi.brainmob)
 				return TRUE
 
-/obj/machinery/mommi_spawner/proc/makeMoMMI(var/mob/user, var/obj/item/device/mmi/use_mmi)
+/obj/machinery/mommi_spawner/proc/makeMoMMI(var/mob/user)
 	building = TRUE
 	update_icon()
 	if(!user || !istype(user) || !user.client)
@@ -156,22 +158,21 @@
 			user.mind.transfer_to(M)
 			if(M.mind.assigned_role == "MoMMI")
 				M.mind.original = M
-			else if(M.mind.special_role)
+			else if(user.mind.special_role)
 				M.mind.store_memory("In case you look at this after being borged, the objectives are only here until I find a way to make them not show up for you, as I can't simply delete them without screwing up round-end reporting. --NeoFite")
-		M.job = "MoMMI"
+		M.key = user.key
+		M.job = "Mobile MMI"
 
 		//M.cell = locate(/obj/item/weapon/cell) in contents
 		//M.cell.loc = M
+		user.forceMove(M)//Should fix cybros run time erroring when blown up. It got deleted before, along with the frame.
 
-		if(use_mmi)
-			M.mmi = use_mmi
-			use_mmi.forceMove(M)
+		M.mmi = new /obj/item/device/mmi(M)
+		M.mmi.transfer_identity(user)
 		M.Namepick()
 		M.updatename()
 
-		if(!use_mmi)
-			M.key = user.key
-			qdel(user)
+		qdel(user)
 
 		metal=0
 		building=0

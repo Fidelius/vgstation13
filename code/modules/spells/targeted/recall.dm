@@ -53,9 +53,6 @@
 /spell/targeted/bound_object/is_valid_target(var/obj/target)
 	if(!istype(target))
 		return 0
-	var/datum/zLevel/L = get_z_level(target)
-	if(L.teleJammed && get_dist(target,holder) >= range)
-		return 0
 	if(target.anchored && !allow_anchored)
 		return 0
 	for(var/J in prohibited)

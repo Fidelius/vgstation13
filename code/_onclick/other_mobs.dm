@@ -7,6 +7,12 @@
 /mob/living/carbon/human/UnarmedAttack(var/atom/A, var/proximity, var/params)
 	var/obj/item/clothing/gloves/G = gloves // not typecast specifically enough in defines
 
+	// Special glove functions:
+	// If the gloves do anything, have them return 1 to stop
+	// normal attack_hand() here.
+	if(proximity && istype(G) && G.Touch(A, src, 1))
+		return
+
 	if(a_intent == "hurt" && A.loc != src)
 		var/special_attack_result = SPECIAL_ATTACK_SUCCESS
 		switch(attack_type) //Special attacks - kicks, bites
@@ -37,12 +43,6 @@
 					delayNextAttack(-10) //This is only called when the bite fails
 				else
 					set_attack_type() //Reset attack type
-
-	// Special glove functions:
-	// If the gloves do anything, have them return 1 to stop
-	// normal attack_hand() here.
-	if(proximity && istype(G) && G.Touch(A, src, 1))
-		return
 
 	if(ismob(A))
 		delayNextAttack(10)

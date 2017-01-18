@@ -84,8 +84,6 @@
 		/obj/item/weapon/stock_parts/matter_bin,
 		/obj/item/weapon/stock_parts/matter_bin,
 		/obj/item/weapon/stock_parts/manipulator,
-		/obj/item/weapon/stock_parts/manipulator,
-		/obj/item/weapon/stock_parts/micro_laser,
 		/obj/item/weapon/stock_parts/micro_laser,
 		/obj/item/weapon/stock_parts/console_screen
 	)

@@ -286,7 +286,8 @@ var/global/datum/interactive_map/crewmonitor/crewmonitor = new
 						AI.eyeobj.forceMove(tile)
 
 /datum/interactive_map/crewmonitor/queueUpdate(z)
-	SShtml_ui.queue(crewmonitor, "update", z)
+	var/datum/controller/process/html/html = processScheduler.getProcess("html")
+	html.queue(crewmonitor, "update", z)
 
 /datum/interactive_map/crewmonitor/sendResources(client/C)
 	..()

@@ -1,10 +1,12 @@
+/obj/item/clothing/shoes/proc/step_action() //this was made to rewrite clown shoes squeaking
+
 /obj/item/clothing/shoes/syndigaloshes
-	desc = "A pair of brown shoes. They seem to have extra grip." //change line ~346 in code/datums/uplink_item.dm if you remove the second sentence
+	desc = "A pair of brown shoes. They seem to have extra grip."
 	name = "brown shoes"
 	icon_state = "brown"
 	item_state = "brown"
 	permeability_coefficient = 0.05
-	clothing_flags = NOSLIP
+	flags = NOSLIP
 	origin_tech = Tc_SYNDICATE + "=3"
 	var/list/clothing_choices = list()
 	siemens_coefficient = 0.8
@@ -49,7 +51,6 @@
 	icon_state = A.icon_state
 	item_state = A.item_state
 	_color = A._color
-	step_sound = A.step_sound
 	usr.update_inv_w_uniform()	//so our overlays update.
 
 /obj/item/clothing/shoes/mime
@@ -65,7 +66,7 @@
 	desc = "When you want to turn up the heat."
 	icon_state = "swat"
 	armor = list(melee = 80, bullet = 60, laser = 50,energy = 25, bomb = 50, bio = 10, rad = 0)
-	clothing_flags = NOSLIP
+	flags = NOSLIP
 	species_fit = list(VOX_SHAPED)
 	siemens_coefficient = 0.6
 	heat_conductivity = INS_SHOE_HEAT_CONDUCTIVITY
@@ -76,7 +77,7 @@
 	desc = "When you REALLY want to turn up the heat."
 	icon_state = "swat"
 	armor = list(melee = 80, bullet = 60, laser = 50,energy = 25, bomb = 50, bio = 10, rad = 0)
-	clothing_flags = NOSLIP
+	flags = NOSLIP
 	species_fit = list(VOX_SHAPED)
 	siemens_coefficient = 0.6
 	max_heat_protection_temperature = SHOE_MAX_HEAT_PROTECTION_TEMPERATURE
@@ -105,20 +106,14 @@
 	item_state = "laceups"
 
 /obj/item/clothing/shoes/galoshes
-	name = "galoshes"
 	desc = "Rubber boots"
+	name = "galoshes"
 	icon_state = "galoshes"
 	permeability_coefficient = 0.05
-	clothing_flags = NOSLIP
+	flags = NOSLIP
 	slowdown = SHOES_SLOWDOWN+1
 	species_fit = list(VOX_SHAPED)
 	heat_conductivity = INS_SHOE_HEAT_CONDUCTIVITY
-
-/obj/item/clothing/shoes/galoshes/broken
-	name = "ruined galoshes"
-	desc = "The grip treading is broken off."
-	icon_state = "galoshes_ruined"
-	flags = null
 
 /obj/item/clothing/shoes/clown_shoes
 	desc = "The prankster's standard-issue clowning shoes. Damn they're huge!"
@@ -129,7 +124,8 @@
 	_color = "clown"
 	footprint_type = /obj/effect/decal/cleanable/blood/tracks/footprints/clown
 
-	step_sound = "clownstep"
+	var/step_sound = "clownstep"
+	var/footstep = 1	//used for squeeks whilst walking
 
 /obj/item/clothing/shoes/clown_shoes/attackby(obj/item/weapon/W, mob/user)
 	..()
@@ -138,6 +134,19 @@
 		qdel(W)
 		qdel(src)
 
+/obj/item/clothing/shoes/clown_shoes/step_action()
+	if(ishuman(loc))
+		var/mob/living/carbon/human/H = loc
+
+		if(H.m_intent == "run")
+			if(footstep > 1)
+				footstep = 0
+				playsound(H, step_sound, 50, 1) // this will get annoying very fast.
+			else
+				footstep++
+		else
+			playsound(H, step_sound, 20, 1)
+
 #define CLOWNSHOES_RANDOM_SOUND "random sound"
 
 /obj/item/clothing/shoes/clown_shoes/advanced
@@ -145,7 +154,7 @@
 	desc = "Only granted to the most devout followers of Honkmother."
 	icon_state = "superclown"
 	item_state = "superclown"
-	clothing_flags = NOSLIP
+	flags = NOSLIP
 	var/list/sound_list = list(
 		"Clown squeak" = "clownstep",
 		"Bike horn" = 'sound/items/bikehorn.ogg',
@@ -268,7 +277,7 @@
 
 /obj/item/clothing/shoes/jackboots/knifeholster/New() //This one comes with preloaded knife holster
 	..()
-	attach_accessory(new /obj/item/clothing/accessory/holster/knife/boot/preloaded/tactical)
+	attach_accessory(new /obj/item/clothing/accessory/holster/knife/boot/preloaded)
 
 /obj/item/clothing/shoes/jackboots/batmanboots
 	name = "batboots"
@@ -391,10 +400,3 @@
 	item_state = "workboots"
 	species_fit = list(VOX_SHAPED)
 	footprint_type = /obj/effect/decal/cleanable/blood/tracks/footprints/boots
-
-/obj/item/clothing/shoes/rottenshoes
-	name = "rotten shoes"
-	desc = "These shoes seem perfect for sneaking around."
-	icon_state = "rottenshoes"
-	item_state = "rottenshoes"
-	inhand_states = list("left_hand" = 'icons/mob/in-hand/left/clothing.dmi', "right_hand" = 'icons/mob/in-hand/right/clothing.dmi')

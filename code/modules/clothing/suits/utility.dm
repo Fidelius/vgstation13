@@ -21,7 +21,7 @@
 	body_parts_covered = ARMS|LEGS|FULL_TORSO|FEET|HANDS
 	allowed = list(/obj/item/device/flashlight,/obj/item/weapon/tank/emergency_oxygen,/obj/item/weapon/tank/emergency_nitrogen,/obj/item/weapon/extinguisher)
 	slowdown = 1.0
-	clothing_flags = ONESIZEFITSALL
+	flags = FPRINT  | ONESIZEFITSALL
 	pressure_resistance = 3 * ONE_ATMOSPHERE
 	max_heat_protection_temperature = FIRESUIT_MAX_HEAT_PROTECTION_TEMPERATURE
 

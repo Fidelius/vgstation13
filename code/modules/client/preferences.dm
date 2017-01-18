@@ -103,7 +103,6 @@ var/const/MAX_SAVE_SLOTS = 8
 	var/parallax_speed = 2
 	var/special_popup = 0
 	var/tooltips = 1
-	var/stumble = 0						//whether the player pauses after their first step
 	//character preferences
 	var/real_name						//our character's name
 	var/be_random_name = 0				//whether we are a random name every round
@@ -325,8 +324,6 @@ var/const/MAX_SAVE_SLOTS = 8
 	<a href='?_src_=prefs;preference=nanoui'><b>[(usenanoui) ? "NanoUI" : "HTML"]</b></a><br>
 	<b>Progress Bars:</b>
 	<a href='?_src_=prefs;preference=progbar'><b>[(progress_bars) ? "Yes" : "No"]</b></a><br>
-	<b>Pause after first step:</b>
-	<a href='?_src_=prefs;preference=stumble'><b>[(stumble) ? "Yes" : "No"]</b></a><br>
   </div>
   <div id="rightDiv" style="width:50%;height:100%;float:right;">
 	<b>Randomized Character Slot:</b>
@@ -1061,13 +1058,25 @@ NOTE:  The change will take effect AFTER any current recruiting periods."}
 					else
 						to_chat(user, "<font color='red'>Invalid name. Your name should be at least 2 and at most [MAX_NAME_LEN] characters long. It may only contain the characters A-Z, a-z, -, ' and .</font>")
 				if("next_hair_style")
-					h_style = next_list_item(h_style, valid_sprite_accessories(gender, species, hair_styles_list))
+					if (gender == MALE)
+						h_style = next_list_item(h_style, hair_styles_male_list)
+					else
+						h_style = next_list_item(h_style, hair_styles_female_list)
 				if("previous_hair_style")
-					h_style = previous_list_item(h_style, valid_sprite_accessories(gender, species, hair_styles_list))
+					if (gender == MALE)
+						h_style = previous_list_item(h_style, hair_styles_male_list)
+					else
+						h_style = previous_list_item(h_style, hair_styles_female_list)
 				if("next_facehair_style")
-					f_style = next_list_item(f_style, valid_sprite_accessories(gender, species, facial_hair_styles_list))
+					if (gender == MALE)
+						f_style = next_list_item(f_style, facial_hair_styles_male_list)
+					else
+						f_style = next_list_item(f_style, facial_hair_styles_female_list)
 				if("previous_facehair_style")
-					f_style = previous_list_item(f_style, valid_sprite_accessories(gender, species, facial_hair_styles_list))
+					if (gender == MALE)
+						f_style = previous_list_item(f_style, facial_hair_styles_male_list)
+					else
+						f_style = previous_list_item(f_style, facial_hair_styles_female_list)
 				if("age")
 					var/new_age = input(user, "Choose your character's age:\n([AGE_MIN]-[AGE_MAX])", "Character Preference") as num|null
 					if(new_age)
@@ -1092,7 +1101,17 @@ NOTE:  The change will take effect AFTER any current recruiting periods."}
 
 					if(prev_species != species)
 						//grab one of the valid hair styles for the newly chosen species
-						var/list/valid_hairstyles = valid_sprite_accessories(gender, species, hair_styles_list)
+						var/list/valid_hairstyles = list()
+						for(var/hairstyle in hair_styles_list)
+							var/datum/sprite_accessory/S = hair_styles_list[hairstyle]
+							if(gender == MALE && S.gender == FEMALE)
+								continue
+							if(gender == FEMALE && S.gender == MALE)
+								continue
+							if( !(species in S.species_allowed))
+								continue
+							valid_hairstyles[hairstyle] = hair_styles_list[hairstyle]
+
 						if(valid_hairstyles.len)
 							h_style = pick(valid_hairstyles)
 						else
@@ -1100,7 +1119,18 @@ NOTE:  The change will take effect AFTER any current recruiting periods."}
 							h_style = hair_styles_list["Bald"]
 
 						//grab one of the valid facial hair styles for the newly chosen species
-						var/list/valid_facialhairstyles = valid_sprite_accessories(gender, species, facial_hair_styles_list)
+						var/list/valid_facialhairstyles = list()
+						for(var/facialhairstyle in facial_hair_styles_list)
+							var/datum/sprite_accessory/S = facial_hair_styles_list[facialhairstyle]
+							if(gender == MALE && S.gender == FEMALE)
+								continue
+							if(gender == FEMALE && S.gender == MALE)
+								continue
+							if( !(species in S.species_allowed))
+								continue
+
+							valid_facialhairstyles[facialhairstyle] = facial_hair_styles_list[facialhairstyle]
+
 						if(valid_facialhairstyles.len)
 							f_style = pick(valid_facialhairstyles)
 						else
@@ -1171,7 +1201,15 @@ NOTE:  The change will take effect AFTER any current recruiting periods."}
 							b_hair = hex2num(copytext(new_hair, 6, 8))
 
 				if("h_style")
-					var/new_h_style = input(user, "Choose your character's hair style:", "Character Preference")  as null|anything in valid_sprite_accessories(null, species, hair_styles_list) //gender intentionally left null so speshul snowflakes can cross-hairdress
+					var/list/valid_hairstyles = list()
+					for(var/hairstyle in hair_styles_list)
+						var/datum/sprite_accessory/S = hair_styles_list[hairstyle]
+						if( !(species in S.species_allowed))
+							continue
+
+						valid_hairstyles[hairstyle] = hair_styles_list[hairstyle]
+
+					var/new_h_style = input(user, "Choose your character's hair style:", "Character Preference")  as null|anything in valid_hairstyles
 					if(new_h_style)
 						h_style = new_h_style
 
@@ -1184,7 +1222,19 @@ NOTE:  The change will take effect AFTER any current recruiting periods."}
 							b_facial = hex2num(copytext(new_facial, 6, 8))
 
 				if("f_style")
-					var/new_f_style = input(user, "Choose your character's facial-hair style:", "Character Preference")  as null|anything in valid_sprite_accessories(gender, species, facial_hair_styles_list)
+					var/list/valid_facialhairstyles = list()
+					for(var/facialhairstyle in facial_hair_styles_list)
+						var/datum/sprite_accessory/S = facial_hair_styles_list[facialhairstyle]
+						if(gender == MALE && S.gender == FEMALE)
+							continue
+						if(gender == FEMALE && S.gender == MALE)
+							continue
+						if( !(species in S.species_allowed))
+							continue
+
+						valid_facialhairstyles[facialhairstyle] = facial_hair_styles_list[facialhairstyle]
+
+					var/new_f_style = input(user, "Choose your character's facial-hair style:", "Character Preference")  as null|anything in valid_facialhairstyles
 					if(new_f_style)
 						f_style = new_f_style
 
@@ -1213,16 +1263,10 @@ NOTE:  The change will take effect AFTER any current recruiting periods."}
 						if(new_s_tone)
 							s_tone = 35 - max(min(round(new_s_tone),220),1)
 					else if(species == "Vox")//Can't reference species flags here, sorry.
-						var/skin_c = input(user, "Choose your Vox's skin color:\n(1 = Green, 2 = Brown, 3 = Gray, 4 = Light Green, 5 = Azure, 6 = Emerald)", "Character Preference") as num|null
+						var/skin_c = input(user, "Choose your Vox's skin color:\n(1 = Green, 2 = Brown, 3 = Gray)", "Character Preference") as num|null
 						if(skin_c)
-							s_tone = max(min(round(skin_c),6),1)
+							s_tone = max(min(round(skin_c),3),1)
 							switch(s_tone)
-								if(6)
-									to_chat(user,"Your vox will now be emerald.")
-								if(5)
-									to_chat(user,"Your vox will now be azure.")
-								if(4)
-									to_chat(user,"Your vox will now be light green.")
 								if(3)
 									to_chat(user,"Your vox will now be gray.")
 								if(2)
@@ -1461,8 +1505,6 @@ NOTE:  The change will take effect AFTER any current recruiting periods."}
 					tooltips = !tooltips
 				if("progbar")
 					progress_bars = !progress_bars
-				if("stumble")
-					stumble = !stumble
 
 				if("ghost_deadchat")
 					toggles ^= CHAT_DEAD
@@ -1607,7 +1649,7 @@ NOTE:  The change will take effect AFTER any current recruiting periods."}
 		else
 			continue
 	var/datum/species/chosen_species = all_species[species]
-	if( (disabilities & DISABILITY_FLAG_FAT) && (chosen_species.anatomy_flags & CAN_BE_FAT) )
+	if( (disabilities & DISABILITY_FLAG_FAT) && (chosen_species.flags & CAN_BE_FAT) )
 		character.mutations += M_FAT
 		character.mutations += M_OBESITY
 	if(disabilities & DISABILITY_FLAG_NEARSIGHTED)
@@ -1682,13 +1724,13 @@ NOTE:  The change will take effect AFTER any current recruiting periods."}
 		<legend>Legend</legend>
 		<dl>
 			<dt>Never:</dt>
-			<dd>Decline this role for this round and all future rounds. You will not be polled again.</dd>
+			<dd>Automatically respond 'no' to all requests to become this role.</dd>
 			<dt>No:</dt>
-			<dd>Default. Decline this role for this round only.</dd>
+			<dd>Responds no to requests to become this role, with options to sign up to become it. Default.</dd>
 			<dt>Yes:</dt>
-			<dd>Accept this role for this round only.</dd>
+			<dd>Responds yes to requests to become this role, with options to opt out of becoming it.</dd>
 			<dt>Always:</dt>
-			<dd>Accept this role for this round and all future rounds. You will not be polled again.</dd>
+			<dd>Automatically respond 'yes' to all requests to become this role.</dd>
 		</dl>
 	</fieldset>
 

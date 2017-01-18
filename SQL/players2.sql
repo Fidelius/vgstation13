@@ -109,8 +109,7 @@ CREATE TABLE client (
 	tooltips       INTEGER,
     space_parallax INTEGER,
     space_dust     INTEGER,
-    parallax_speed INTEGER,
-    stumble        INTEGER
+    parallax_speed INTEGER
 );
 
 

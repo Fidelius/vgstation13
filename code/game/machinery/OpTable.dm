@@ -1,5 +1,5 @@
 /obj/machinery/optable
-	name = "operating table"
+	name = "Operating Table"
 	desc = "Used for advanced medical procedures."
 	icon = 'icons/obj/surgery.dmi'
 	icon_state = "table2-idle"

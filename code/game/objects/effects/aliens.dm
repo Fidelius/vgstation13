@@ -41,8 +41,6 @@
 	icon_state = "resinmembrane"
 	opacity = 0
 	health = 120
-	plane = ABOVE_HUMAN_PLANE
-	layer = ABOVE_OBJ_LAYER
 
 /obj/effect/alien/resin/New()
 	..()
@@ -454,7 +452,7 @@
 	density = 0
 	anchored = 1
 
-	var/health = 50
+	var/health = 100
 	var/status = GROWING //can be GROWING, GROWN or BURST; all mutually exclusive
 
 	flags = PROXMOVE
@@ -541,8 +539,8 @@
 
 	var/damage = W.force
 
-	if(W.is_hot())
-		damage = damage * 2.0
+	if(!W.is_hot())
+		damage = damage / 4.0
 
 	src.health -= damage
 	src.healthcheck()

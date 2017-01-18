@@ -270,13 +270,27 @@ var/global/list/alert_overlays_global = list()
 		if(check_access(ID))
 			access_granted = 1
 
-	if(alarmed && density && lockdown && !access_granted/* && !( users_name in users_to_open ) */)
-		if(horror_force(user))
+	var/answer = "Yes"
+	if(answer == "No")
+		return
+	if(user.locked_to)
+		if(!istype(user.locked_to, /obj/structure/bed/chair/vehicle))
+			to_chat(user, "Sorry, you must remain able bodied and close to \the [src] in order to use it.")
 			return
-
-		to_chat(user, "<span class='warning'>Access denied. Please wait for authorities to arrive, or for the alert to clear.</span>")
+	if(user.incapacitated() || get_dist(src, user) > 1)
+		to_chat(user, "Sorry, you must remain able bodied and close to \the [src] in order to use it.")
 		return
 
+	if(alarmed && density && lockdown && !access_granted/* && !( users_name in users_to_open ) */)
+		// Too many shitters on /vg/ for the honor system to work.
+		to_chat(user, "<span class='warning'>Access denied. Please wait for authorities to arrive, or for the alert to clear.</span>")
+		return
+		// End anti-shitter system
+		/*
+		user.visible_message("<span class='warning'>\The [src] opens for \the [user]</span>",\
+		"\The [src] opens after you acknowledge the consequences.",\
+		"You hear a beep, and a door opening.")
+		*/
 	else
 		user.visible_message("<span class='notice'>\The [src] [density ? "open" : "close"]s for \the [user].</span>",\
 		"\The [src] [density ? "open" : "close"]s.",\
@@ -300,7 +314,6 @@ var/global/list/alert_overlays_global = list()
 		spawn(50)
 			if(alarmed && !density)
 				close()
-
 /obj/machinery/door/firedoor/open()
 	if(!loc || blocked)
 		return
@@ -313,7 +326,6 @@ var/global/list/alert_overlays_global = list()
 	if(alarmed)
 		spawn(50)
 			close()
-
 /obj/machinery/door/firedoor/proc/force_open(mob/user, var/obj/C) //used in mecha/equipment/tools/tools.dm
 	var/area/A = get_area_master(src)
 	ASSERT(istype(A)) // This worries me.
@@ -337,12 +349,7 @@ var/global/list/alert_overlays_global = list()
 		spawn(0)
 			close()
 	investigation_log(I_ATMOS, "has been [density ? "closed" : "opened"] [alarmed ? "while alarming" : ""] by [user.real_name] ([formatPlayerPanel(user, user.ckey)]) at [formatJumpTo(get_turf(src))]")
-	return TRUE
-
-/obj/machinery/door/firedoor/horror_force(var/mob/living/carbon/human/H)
-	if(!ishorrorform(H))
-		return FALSE
-	return force_open(H)
+	return
 
 /obj/machinery/door/firedoor/close()
 	if(blocked || !loc)

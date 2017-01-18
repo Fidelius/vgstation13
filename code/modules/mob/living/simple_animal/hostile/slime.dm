@@ -22,7 +22,6 @@
 	meat_type = null
 
 	var/colour = "grey"
-	held_items = list()
 
 /mob/living/simple_animal/hostile/slime/New()
 	..()

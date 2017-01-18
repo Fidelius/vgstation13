@@ -81,7 +81,6 @@ var/savefile/panicfile
 	if(config.usealienwhitelist)
 		load_alienwhitelist()
 	jobban_loadbanfile()
-	oocban_loadbanfile()
 	jobban_updatelegacybans()
 	appearance_loadbanfile()
 	LoadBans()
@@ -140,13 +139,23 @@ var/savefile/panicfile
 	send2mainirc("Server starting up on [config.server? "byond://[config.server]" : "byond://[world.address]:[world.port]"]")
 	send2maindiscord("**Server starting up** on `[config.server? "byond://[config.server]" : "byond://[world.address]:[world.port]"]`. Map is **[map.nameLong]**")
 
+	processScheduler = new
+	master_controller = new /datum/controller/game_controller()
+
 	spawn(1)
 		turfs = new/list(maxx*maxy*maxz)
 		world.log << "DEBUG: TURFS LIST LENGTH [turfs.len]"
 		build_turfs_list()
 
-		spawn(9)
-			Master.Setup()
+		processScheduler.deferSetupFor(/datum/controller/process/ticker)
+		processScheduler.setup()
+
+		master_controller.setup()
+
+		setup_species()
+		setup_shuttles()
+
+		stat_collection.artifacts_discovered = 0 // Because artifacts during generation get counted otherwise!
 
 	for(var/plugin_type in typesof(/plugin))
 		var/plugin/P = new plugin_type()
@@ -265,7 +274,7 @@ var/savefile/panicfile
 				fcopy(vote.chosen_map, filename)
 			sleep(60)
 
-	Master.Shutdown()
+	processScheduler.stop()
 	paperwork_stop()
 
 	spawn()
@@ -365,7 +374,12 @@ var/savefile/panicfile
 		s += "<b>[config.server_name]</b> &#8212; "
 
 
-	s += {"<b>[station_name()]</b>"NSS Castro"}
+	s += {"<b>[station_name()]</b>"
+		(
+		<a href=\"http://\">" //Change this to wherever you want the hub to link to
+		Default"  //Replace this with something else. Or ever better, delete it and uncomment the game version
+		</a>
+		)"}
 	var/list/features = list()
 
 	if(ticker)

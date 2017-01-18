@@ -197,7 +197,12 @@
 	..()
 
 	if(statpanel("Status"))
-		stat(null, "Health: [round((health / maxHealth) * 100)]%")
+		if(istype(src, /mob/living/carbon/slime/adult))
+			stat(null, "Health: [round((health / 200) * 100)]%")
+		else
+			stat(null, "Health: [round((health / 150) * 100)]%")
+
+
 
 		if(istype(src,/mob/living/carbon/slime/adult))
 			stat(null, "Nutrition: [nutrition]/1200")
@@ -302,38 +307,105 @@
 /mob/living/carbon/slime/attack_ui(slot)
 	return
 
-/mob/living/carbon/slime/attack_slime(mob/living/carbon/slime/M)
-	M.unarmed_attack_mob(src)
+/mob/living/carbon/slime/attack_slime(mob/living/carbon/slime/M as mob)
+	if (!ticker)
+		to_chat(M, "You cannot attack people before the game has started.")
+		return
+
+	if(Victim)
+		return // can't attack while eating!
+
+	if (health > -100)
+
+		for(var/mob/O in viewers(src, null))
+			if ((O.client && !( O.blinded )))
+				O.show_message(text("<span class='danger'>The [M.name] has glomped []!</span>", src), 1)
+		add_logs(M, src, "glomped on", 0)
+
+		var/damage = rand(1, 3)
+		attacked += 5
+
+		if(istype(src, /mob/living/carbon/slime/adult))
+			damage = rand(1, 6)
+		else
+			damage = rand(1, 3)
+
+		adjustBruteLoss(damage)
 
 
-/mob/living/carbon/slime/attack_animal(mob/living/simple_animal/M)
-	M.unarmed_attack_mob(src)
+		updatehealth()
 
-/mob/living/carbon/slime/attack_paw(mob/living/carbon/monkey/M)
+	return
+
+
+/mob/living/carbon/slime/attack_animal(mob/living/simple_animal/M as mob)
+	if(M.melee_damage_upper == 0)
+		M.emote("[M.friendly] [src]")
+	else
+		if(M.attack_sound)
+			playsound(loc, M.attack_sound, 50, 1, 1)
+		for(var/mob/O in viewers(src, null))
+			O.show_message("<span class='warning'><B>[M]</B> [M.attacktext] [src]!</span>", 1)
+		M.attack_log += text("\[[time_stamp()]\] <font color='red'>attacked [src.name] ([src.ckey])</font>")
+		src.attack_log += text("\[[time_stamp()]\] <font color='orange'>was attacked by [M.name] ([M.ckey])</font>")
+		var/damage = rand(M.melee_damage_lower, M.melee_damage_upper)
+		adjustBruteLoss(damage)
+		updatehealth()
+
+/mob/living/carbon/slime/attack_paw(mob/living/carbon/monkey/M as mob)
 	if(!(istype(M, /mob/living/carbon/monkey)))
 		return//Fix for aliens receiving double messages when attacking other aliens.
 
+	if (!ticker)
+		to_chat(M, "You cannot attack people before the game has started.")
+		return
+
+	if (istype(loc, /turf) && istype(loc.loc, /area/start))
+		to_chat(M, "No attacking people at spawn, you jackass.")
+		return
 	..()
 
 	switch(M.a_intent)
 
-		if(I_HELP)
+		if (I_HELP)
 			help_shake_act(M)
 		else
-			M.unarmed_attack_mob(src)
+			if (istype(wear_mask, /obj/item/clothing/mask/muzzle))
+				return
+			if (health > 0)
+				attacked += 10
+				//playsound(loc, 'sound/weapons/bite.ogg', 50, 1, -1)
+				for(var/mob/O in viewers(src, null))
+					if ((O.client && !( O.blinded )))
+						O.show_message(text("<span class='danger'>[M.name] has attacked [src]!</span>"), 1)
+				adjustBruteLoss(rand(1, 3))
+				updatehealth()
+	return
 
 
 /mob/living/carbon/slime/attack_hand(mob/living/carbon/human/M as mob)
+	if (!ticker)
+		to_chat(M, "You cannot attack people before the game has started.")
+		return
+
+	if (istype(loc, /turf) && istype(loc.loc, /area/start))
+		to_chat(M, "No attacking people at spawn, you jackass.")
+		return
+
 	..()
 
 	if(Victim)
 		if(Victim == M)
 			if(prob(60))
-				visible_message("<span class='warning'>[M] attempts to wrestle \the [name] off!</span>")
+				for(var/mob/O in viewers(src, null))
+					if ((O.client && !( O.blinded )))
+						O.show_message("<span class='warning'>[M] attempts to wrestle \the [name] off!</span>", 1)
 				playsound(loc, 'sound/weapons/punchmiss.ogg', 25, 1, -1)
 
 			else
-				visible_message("<span class='warning'>[M] manages to wrestle \the [name] off!</span>")
+				for(var/mob/O in viewers(src, null))
+					if ((O.client && !( O.blinded )))
+						O.show_message("<span class='warning'>[M] manages to wrestle \the [name] off!</span>", 1)
 				playsound(loc, 'sound/weapons/thudswoosh.ogg', 50, 1, -1)
 
 				if(prob(90) && !client)
@@ -353,11 +425,15 @@
 
 		else
 			if(prob(30))
-				visible_message("<span class='warning'>[M] attempts to wrestle \the [name] off of [Victim]!</span>")
+				for(var/mob/O in viewers(src, null))
+					if ((O.client && !( O.blinded )))
+						O.show_message("<span class='warning'>[M] attempts to wrestle \the [name] off of [Victim]!</span>", 1)
 				playsound(loc, 'sound/weapons/punchmiss.ogg', 25, 1, -1)
 
 			else
-				visible_message("<span class='warning'>[M] manages to wrestle \the [name] off of [Victim]!</span>")
+				for(var/mob/O in viewers(src, null))
+					if ((O.client && !( O.blinded )))
+						O.show_message("<span class='warning'>[M] manages to wrestle \the [name] off of [Victim]!</span>", 1)
 				playsound(loc, 'sound/weapons/thudswoosh.ogg', 50, 1, -1)
 
 				if(prob(80) && !client)
@@ -380,13 +456,43 @@
 			return
 
 
+
+
+	if(M.gloves && istype(M.gloves,/obj/item/clothing/gloves))
+		var/obj/item/clothing/gloves/G = M.gloves
+		if(G.cell)
+			if(M.a_intent == I_HURT)//Stungloves. Any contact will stun the alien.
+				if(G.cell.charge >= 2500)
+					G.cell.use(2500)
+					for(var/mob/O in viewers(src, null))
+						if ((O.client && !( O.blinded )))
+							O.show_message("<span class='danger'>[src] has been touched with the stun gloves by [M]!</span>", 1, "<span class='warning'>You hear someone fall.</span>", 2)
+					return
+				else
+					to_chat(M, "<span class='warning'>Not enough charge! </span>")
+					return
+
 	switch(M.a_intent)
 
 		if (I_HELP)
 			help_shake_act(M)
 
 		if (I_GRAB)
-			M.grab_mob(src)
+			if (M.grab_check(src))
+				return
+			var/obj/item/weapon/grab/G = getFromPool(/obj/item/weapon/grab,M,src)
+
+			M.put_in_active_hand(G)
+
+			grabbed_by += G
+			G.synch()
+
+			LAssailant = M
+
+			playsound(loc, 'sound/weapons/thudswoosh.ogg', 50, 1, -1)
+			for(var/mob/O in viewers(src, null))
+				if ((O.client && !( O.blinded )))
+					O.show_message(text("<span class='warning'>[] has grabbed [] passively!</span>", M, src), 1)
 
 		else
 
@@ -409,49 +515,110 @@
 
 
 				playsound(loc, "punch", 25, 1, -1)
-				visible_message("<span class='danger'>[M] has punched [src]!</span>")
+				for(var/mob/O in viewers(src, null))
+					if ((O.client && !( O.blinded )))
+						O.show_message(text("<span class='danger'>[] has punched []!</span>", M, src), 1)
 
 				adjustBruteLoss(damage)
 				updatehealth()
 			else
 				playsound(loc, 'sound/weapons/punchmiss.ogg', 25, 1, -1)
-				visible_message("<span class='danger'>[M] has attempted to punch [src]!</span>")
+				for(var/mob/O in viewers(src, null))
+					if ((O.client && !( O.blinded )))
+						O.show_message(text("<span class='danger'>[] has attempted to punch []!</span>", M, src), 1)
 	return
 
 
 
 /mob/living/carbon/slime/attack_alien(mob/living/carbon/alien/humanoid/M as mob)
+	if (!ticker)
+		to_chat(M, "You cannot attack people before the game has started.")
+		return
+
+	if (istype(loc, /turf) && istype(loc.loc, /area/start))
+		to_chat(M, "No attacking people at spawn, you jackass.")
+		return
+
 	switch(M.a_intent)
 		if (I_HELP)
-			visible_message("<span class='notice'>[M] caresses [src] with its scythe like arm.</span>")
+			for(var/mob/O in viewers(src, null))
+				if ((O.client && !( O.blinded )))
+					O.show_message(text("<span class='notice'>[M] caresses [src] with its scythe like arm.</span>"), 1)
 
 		if (I_HURT)
-			M.unarmed_attack_mob(src)
+
+			if ((prob(95) && health > 0))
+				attacked += 10
+				playsound(loc, 'sound/weapons/slice.ogg', 25, 1, -1)
+				var/damage = rand(15, 30)
+				if (damage >= 25)
+					damage = rand(20, 40)
+					for(var/mob/O in viewers(src, null))
+						if ((O.client && !( O.blinded )))
+							O.show_message(text("<span class='danger'>[] has attacked [name]!</span>", M), 1)
+				else
+					for(var/mob/O in viewers(src, null))
+						if ((O.client && !( O.blinded )))
+							O.show_message(text("<span class='danger'>[] has wounded [name]!</span>", M), 1)
+				adjustBruteLoss(damage)
+				updatehealth()
+			else
+				playsound(loc, 'sound/weapons/slashmiss.ogg', 25, 1, -1)
+				for(var/mob/O in viewers(src, null))
+					if ((O.client && !( O.blinded )))
+						O.show_message(text("<span class='danger'>[] has attempted to lunge at [name]!</span>", M), 1)
 
 		if (I_GRAB)
-			M.grab_mob(src)
+			if (M.grab_check(src))
+				return
+			var/obj/item/weapon/grab/G = getFromPool(/obj/item/weapon/grab,M,src)
+
+			M.put_in_active_hand(G)
+
+			grabbed_by += G
+			G.synch()
+
+			LAssailant = M
+
+			playsound(loc, 'sound/weapons/thudswoosh.ogg', 50, 1, -1)
+			for(var/mob/O in viewers(src, null))
+				O.show_message(text("<span class='warning'>[] has grabbed [name] passively!</span>", M), 1)
 
 		if (I_DISARM)
 			playsound(loc, 'sound/weapons/pierce.ogg', 25, 1, -1)
 			var/damage = 5
 			attacked += 10
 
-			visible_message("<span class='danger'>[M] has tackled [src]!</span>")
+			if(prob(95))
+				for(var/mob/O in viewers(src, null))
+					if ((O.client && !( O.blinded )))
+						O.show_message(text("<span class='danger'>[] has tackled [name]!</span>", M), 1)
 
-			if(Victim)
-				Victim = null
-				anchored = 0
-				if(prob(80) && !client)
-					Discipline++
+				if(Victim)
+					Victim = null
+					anchored = 0
+					if(prob(80) && !client)
+						Discipline++
+						if(!istype(src, /mob/living/carbon/slime))
+							if(Discipline == 1)
+								attacked = 0
 
-			SStun = 1
-			spawn(rand(5,20))
-				SStun = 0
+				spawn()
+					SStun = 1
+					sleep(rand(5,20))
+					SStun = 0
 
-			step_away(src,M,15)
-			spawn(3)
-				step_away(src,M,15)
+				spawn(0)
 
+					step_away(src,M,15)
+					sleep(3)
+					step_away(src,M,15)
+
+			else
+				drop_item()
+				for(var/mob/O in viewers(src, null))
+					if ((O.client && !( O.blinded )))
+						O.show_message(text("<span class='danger'>[] has disarmed [name]!</span>", M), 1)
 			adjustBruteLoss(damage)
 			updatehealth()
 	return
@@ -586,34 +753,34 @@ mob/living/carbon/slime/var/temperature_resistance = T0C+75
 	var/enhanced = 0 //has it been enhanced before?
 	var/primarytype = /mob/living/carbon/slime
 
-/obj/item/slime_extract/attackby(obj/item/O as obj, mob/user as mob)
-	if(istype(O, /obj/item/weapon/slimesteroid2))
-		if(enhanced == 1)
-			to_chat(user, "<span class='warning'>This extract has already been enhanced!</span>")
-			return ..()
-		if(Uses == 0)
-			to_chat(user, "<span class='warning'>You can't enhance a used extract!</span>")
-			return ..()
-		to_chat(user, "You apply the enhancer. It now has triple the amount of uses.")
-		Uses = 3
-		enhanced = 1
-		qdel(O)
+	attackby(obj/item/O as obj, mob/user as mob)
+		if(istype(O, /obj/item/weapon/slimesteroid2))
+			if(enhanced == 1)
+				to_chat(user, "<span class='warning'>This extract has already been enhanced!</span>")
+				return ..()
+			if(Uses == 0)
+				to_chat(user, "<span class='warning'>You can't enhance a used extract!</span>")
+				return ..()
+			to_chat(user, "You apply the enhancer. It now has triple the amount of uses.")
+			Uses = 3
+			enhanced = 1
+			qdel(O)
 
-	//slime res
-	if(istype(O, /obj/item/weapon/slimeres))
-		if(Uses == 0)
-			to_chat(user, "<span class='warning'>The solution doesn't work on used extracts!</span>")
-			return ..()
-		to_chat(user, "You splash the Slime Resurrection Serum onto the extract causing it to quiver and come to life.")
-		new primarytype(get_turf(src))
-		Uses--
-		qdel(O)
+		//slime res
+		if(istype(O, /obj/item/weapon/slimeres))
+			if(Uses == 0)
+				to_chat(user, "<span class='warning'>The solution doesn't work on used extracts!</span>")
+				return ..()
+			to_chat(user, "You splash the Slime Resurrection Serum onto the extract causing it to quiver and come to life.")
+			new primarytype(get_turf(src))
+			Uses--
+			qdel(O)
 
 /obj/item/slime_extract/New()
-	..()
-	var/datum/reagents/R = new/datum/reagents(100)
-	reagents = R
-	R.my_atom = src
+		..()
+		var/datum/reagents/R = new/datum/reagents(100)
+		reagents = R
+		R.my_atom = src
 
 /obj/item/slime_extract/grey
 	name = "grey slime extract"
@@ -918,7 +1085,7 @@ mob/living/carbon/slime/var/temperature_resistance = T0C+75
 	permeability_coefficient = 0.50
 	body_parts_covered = UPPER_TORSO|LOWER_TORSO|LEGS|FEET|ARMS|HANDS|HEAD
 	slowdown = 1.0
-	clothing_flags = ONESIZEFITSALL
+	flags = FPRINT  | ONESIZEFITSALL
 	pressure_resistance = 200 * ONE_ATMOSPHERE
 	max_heat_protection_temperature = FIRESUIT_MAX_HEAT_PROTECTION_TEMPERATURE
 	heat_conductivity = SPACESUIT_HEAT_CONDUCTIVITY
@@ -931,7 +1098,7 @@ mob/living/carbon/slime/var/temperature_resistance = T0C+75
 	icon_state = "golem"
 	item_state = null
 	canremove = 0
-	clothing_flags = NOSLIP
+	flags = NOSLIP
 	slowdown = SHOES_SLOWDOWN+1
 
 /obj/item/clothing/mask/gas/golem
@@ -980,73 +1147,73 @@ mob/living/carbon/slime/var/temperature_resistance = T0C+75
 	layer = RUNE_LAYER
 	var/list/mob/dead/observer/ghosts[0]
 
-/obj/effect/golem_rune/New()
-	..()
-	processing_objects.Add(src)
+	New()
+		..()
+		processing_objects.Add(src)
 
-/obj/effect/golem_rune/process()
-	if(ghosts.len>0)
-		icon_state = "golem2"
-	else
-		icon_state = "golem"
+	process()
+		if(ghosts.len>0)
+			icon_state = "golem2"
+		else
+			icon_state = "golem"
 
-/obj/effect/golem_rune/attack_hand(mob/living/user as mob)
-	var/mob/dead/observer/ghost
-	for(var/mob/dead/observer/O in src.loc)
-		if(!check_observer(O))
-			continue
-		ghost = O
-		break
-	if(!ghost)
-		to_chat(user, "The rune fizzles uselessly. There is no spirit nearby.")
-		return
-	var/mob/living/carbon/human/golem/G = new /mob/living/carbon/human/golem
-	G.real_name = G.species.makeName()
-	G.forceMove(src.loc) //we use move to get the entering procs - this fixes gravity
-	G.key = ghost.key
-	to_chat(G, "You are an adamantine golem. You move slowly, but are highly resistant to heat and cold as well as impervious to burn damage. You are unable to wear most clothing, but can still use most tools. Serve [user], and assist them in completing their goals at any cost.")
-	qdel (src)
-	if(ticker.mode.name == "sandbox")
-		G.CanBuild()
-		to_chat(G, "Sandbox tab enabled.")
+	attack_hand(mob/living/user as mob)
+		var/mob/dead/observer/ghost
+		for(var/mob/dead/observer/O in src.loc)
+			if(!check_observer(O))
+				continue
+			ghost = O
+			break
+		if(!ghost)
+			to_chat(user, "The rune fizzles uselessly. There is no spirit nearby.")
+			return
+		var/mob/living/carbon/human/golem/G = new /mob/living/carbon/human/golem
+		G.real_name = G.species.makeName()
+		G.forceMove(src.loc) //we use move to get the entering procs - this fixes gravity
+		G.key = ghost.key
+		to_chat(G, "You are an adamantine golem. You move slowly, but are highly resistant to heat and cold as well as impervious to burn damage. You are unable to wear most clothing, but can still use most tools. Serve [user], and assist them in completing their goals at any cost.")
+		qdel (src)
+		if(ticker.mode.name == "sandbox")
+			G.CanBuild()
+			to_chat(G, "Sandbox tab enabled.")
 
 
-/obj/effect/golem_rune/proc/announce_to_ghosts()
-	for(var/mob/dead/observer/O in player_list)
-		if(O.client)
-			var/area/A = get_area(src)
-			if(A)
-				to_chat(O, "<span class=\"recruit\">Golem rune created in [A.name]. (<a href='?src=\ref[O];jump=\ref[src]'>Teleport</a> | <a href='?src=\ref[src];signup=\ref[O]'>Sign Up</a>)</span>")
+	proc/announce_to_ghosts()
+		for(var/mob/dead/observer/O in player_list)
+			if(O.client)
+				var/area/A = get_area(src)
+				if(A)
+					to_chat(O, "<span class=\"recruit\">Golem rune created in [A.name]. (<a href='?src=\ref[O];jump=\ref[src]'>Teleport</a> | <a href='?src=\ref[src];signup=\ref[O]'>Sign Up</a>)</span>")
 
-/obj/effect/golem_rune/Topic(href,href_list)
-	if("signup" in href_list)
-		var/mob/dead/observer/O = locate(href_list["signup"])
+	Topic(href,href_list)
+		if("signup" in href_list)
+			var/mob/dead/observer/O = locate(href_list["signup"])
+			volunteer(O)
+
+	attack_ghost(var/mob/dead/observer/O)
+		if(!O)
+			return
 		volunteer(O)
 
-/obj/effect/golem_rune/attack_ghost(var/mob/dead/observer/O)
-	if(!O)
-		return
-	volunteer(O)
+	proc/check_observer(var/mob/dead/observer/O)
+		if(!O)
+			return 0
+		if(!O.client)
+			return 0
+		if(O.mind && O.mind.current && O.mind.current.stat != DEAD)
+			return 0
+		return 1
 
-/obj/effect/golem_rune/proc/check_observer(var/mob/dead/observer/O)
-	if(!O)
-		return 0
-	if(!O.client)
-		return 0
-	if(O.mind && O.mind.current && O.mind.current.stat != DEAD)
-		return 0
-	return 1
-
-/obj/effect/golem_rune/proc/volunteer(var/mob/dead/observer/O)
-	if(O in ghosts)
-		ghosts.Remove(O)
-		to_chat(O, "<span class='warning'>You are no longer signed up to be a golem.</span>")
-	else
-		if(!check_observer(O))
-			to_chat(O, "<span class='warning'>You are not eligable.</span>")
-			return
-		ghosts.Add(O)
-		to_chat(O, "<span class='notice'>You are signed up to be a golem.</span>")
+	proc/volunteer(var/mob/dead/observer/O)
+		if(O in ghosts)
+			ghosts.Remove(O)
+			to_chat(O, "<span class='warning'>You are no longer signed up to be a golem.</span>")
+		else
+			if(!check_observer(O))
+				to_chat(O, "<span class='warning'>You are not eligable.</span>")
+				return
+			ghosts.Add(O)
+			to_chat(O, "<span class='notice'>You are signed up to be a golem.</span>")
 
 
 /mob/living/carbon/slime/has_eyes()

@@ -22,7 +22,7 @@
 	gun_flags = 0
 
 /obj/item/weapon/gun/projectile/nagant/isHandgun()
-	return FALSE
+		return 0
 
 /obj/item/weapon/gun/projectile/nagant/attack_self(mob/living/user as mob)
 	if(recentpump)
@@ -87,19 +87,18 @@
 	w_class = W_CLASS_MEDIUM
 	slot_flags = SLOT_BELT
 
-/obj/item/weapon/gun/projectile/nagant/obrez/isHandgun()
-	return TRUE //WHY NOT
-
-/obj/item/weapon/gun/projectile/nagant/obrez/Fire(atom/target as mob|obj|turf|area, mob/living/user as mob|obj, params, reflex = 0, struggle = 0)
+/obj/item/weapon/gun/projectile/nagant/obrez/afterattack(atom/A as mob|obj|turf|area, mob/living/user as mob|obj, flag, params, struggle = 0)
+	if(flag)
+		return //we're placing gun on a table or in backpack
 	if(current_shell && current_shell.BB)
 		//explosion(src.loc,-1,1,2)
 		var/datum/effect/effect/system/spark_spread/sparks = new /datum/effect/effect/system/spark_spread()
 		sparks.set_up(3, 0, get_turf(user)) //no idea what the 0 is
 		sparks.start()
 
-		var/turf/target_turf = get_turf(target)
+		var/turf/target_turf = get_turf(A)
 		if(target_turf)
-			var/turflist = getline(user, target)
+			var/turflist = getline(user, A)
 			flame_turf(turflist)
 
 		if(prob(15))
@@ -108,7 +107,9 @@
 				user.take_organ_damage(0,10)
 			else
 				to_chat(user, "<span class='notice'>\The [src] almost flies out of your hands!</span>")
-	..()
+
+	Fire(A,user,params, "struggle" = struggle)
+	return 1
 
 /obj/item/weapon/gun/projectile/nagant/obrez/proc/flame_turf(turflist)
 	var/turf/T = turflist[2]

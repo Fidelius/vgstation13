@@ -11,10 +11,7 @@ var/round_end_info = ""
 var/global/list/deadmins = list()
 
 //List of vars that require DEBUG on top of VAREDIT to be able to edit
-var/list/lockedvars = list("vars", "client", "holder")
-
-//List of vars that you can NEVER edit through VV itself
-var/list/nevervars = list("step_x", "step_y")
+var/list/lockedvars = list("vars", "client")
 
 // List of types and how many instances of each type there are.
 var/global/list/type_instances[0]

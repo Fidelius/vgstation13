@@ -49,19 +49,23 @@
 		S.use(5)
 		new /obj/structure/morgue(src.loc)
 		qdel(src)
-	else if(istype(W, /obj/item/weapon/pen) || istype(W, /obj/item/device/flashlight/pen))
-		set_tiny_label(user)
+	if(istype(W, /obj/item/weapon/pen))
+		var/t = copytext(sanitize(input(user, "What would you like the label to be?", text("[]", src.name), null)  as text|null), 1, MAX_NAME_LEN)
+		if(user.get_active_hand() != W)
+			return
+		if (!Adjacent(user) || user.stat)
+			return
+		t = copytext(sanitize(t),1,MAX_MESSAGE_LEN)
+		src.name = "body bag"
+		if(t)
+			src.name += " ([t])"
+			src.overlays += image(src.icon, "bodybag_label")
+		return
 	else if(iswirecutter(W))
-		remove_label()
-		to_chat(user, "<span class='notice'>You cut the tag off the bodybag.</span>")
-
-/obj/structure/closet/body_bag/set_labeled()
-	..()
-	src.overlays += image(src.icon, "bodybag_label")
-
-/obj/structure/closet/body_bag/remove_label()
-	..()
-	src.overlays.len = 0
+		to_chat(user, "You cut the tag off the bodybag")
+		src.name = "body bag"
+		src.overlays.len = 0
+		return
 
 
 /obj/structure/closet/body_bag/close()

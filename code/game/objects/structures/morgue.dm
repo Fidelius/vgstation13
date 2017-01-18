@@ -133,7 +133,16 @@
 		else
 			dir=4
 	if (istype(P, /obj/item/weapon/pen))
-		set_tiny_label(user, " - '", "'")
+		var/t = input(user, "What would you like the label to be?", text("[]", src.name), null) as text
+		if (user.get_active_hand() != P)
+			return
+		if (!Adjacent(user) || user.incapacitated())
+			return
+		t = copytext(sanitize(t),1,MAX_MESSAGE_LEN)
+		if (t)
+			src.name = "morgue- '[t]'"
+		else
+			src.name = initial(src.name)
 	src.add_fingerprint(user)
 
 /obj/structure/morgue/relaymove(mob/user as mob)
@@ -289,7 +298,16 @@
 
 /obj/structure/crematorium/attackby(P as obj, mob/user as mob)
 	if (istype(P, /obj/item/weapon/pen))
-		set_tiny_label(user, " - '", "'")
+		var/t = input(user, "What would you like the label to be?", text("[]", src.name), null)  as text
+		if (user.get_active_hand() != P)
+			return
+		if (!Adjacent(user) || user.stat)
+			return
+		t = copytext(sanitize(t),1,MAX_MESSAGE_LEN)
+		if (t)
+			src.name = text("Crematorium- '[]'", t)
+		else
+			src.name = "Crematorium"
 	src.add_fingerprint(user)
 
 /obj/structure/crematorium/relaymove(mob/user as mob)

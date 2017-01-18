@@ -6,20 +6,15 @@
 	almost anything into a trash can.
 */
 /atom/MouseDrop(atom/over)
-	if(!can_MouseDrop(over))
-		return FALSE
+	if(!usr || !over)
+		return
+	if(!Adjacent(usr) || !over.Adjacent(usr))
+		return // should stop you from dragging through windows
 
 	spawn(0)
 		over.MouseDrop_T(src,usr)
-	return TRUE
+	return
 
 // recieve a mousedrop
 /atom/proc/MouseDrop_T(atom/dropping, mob/user)
 	return
-
-/atom/proc/can_MouseDrop(atom/otheratom, mob/user = usr)
-	if(!user || !otheratom)
-		return FALSE
-	if(!Adjacent(user) || !otheratom.Adjacent(user))
-		return FALSE
-	return TRUE

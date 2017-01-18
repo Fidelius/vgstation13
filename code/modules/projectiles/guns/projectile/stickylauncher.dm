@@ -20,7 +20,7 @@
 	var/current_shells = 200
 
 /obj/item/weapon/gun/stickybomb/isHandgun()
-	return FALSE
+	return 0
 
 /obj/item/weapon/gun/stickybomb/New()
 	..()

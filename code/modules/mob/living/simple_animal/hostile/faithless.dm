@@ -1,6 +1,6 @@
 /mob/living/simple_animal/hostile/faithless
 	name = "The Faithless"
-	desc = "A being of shadow. It posesses a menacing gaze and a tortured voice."
+	desc = "The Wish Granter's faith in humanity, incarnate"
 	icon_state = "faithless"
 	icon_living = "faithless"
 	icon_dead = "faithless_dead"

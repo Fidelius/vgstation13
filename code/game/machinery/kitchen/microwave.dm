@@ -17,7 +17,6 @@
 	var/opened = 0.0
 	var/dirty = 0 // = {0..100} Does it need cleaning?
 	var/broken = 0 // ={0,1,2} How broken is it???
-	var/reagent_disposal = 1 //Does it empty out reagents when you eject? Default yes.
 	var/global/list/datum/recipe/available_recipes // List of the recipes you can use
 	var/global/list/acceptable_items // List of the items you can put in
 	var/global/list/acceptable_reagents // List of the reagents you can put in
@@ -277,8 +276,7 @@
 					dat += {"<b>Expected result: </b>[display_name]<br>"}
 		dat += {"\
 <A href='?src=\ref[src];action=cook'>Turn on!<BR>\
-<A href='?src=\ref[src];action=dispose'>Eject ingredients!<BR><BR><BR>\
-<A href='?src=\ref[src];action=reagenttoggle'>[reagent_disposal ? "Disable reagent disposal" : "Enable reagent disposal"]<BR>\
+<A href='?src=\ref[src];action=dispose'>Eject ingredients!<BR>\
 "}
 
 	user << browse("<HEAD><TITLE>Microwave Controls</TITLE></HEAD><TT>[dat]</TT>", "window=microwave")
@@ -389,8 +387,7 @@
 		O.forceMove(src.loc)
 	if (src.reagents.total_volume)
 		src.dirty++
-	if(reagent_disposal)
-		reagents.clear_reagents()
+	src.reagents.clear_reagents()
 	to_chat(usr, "<span class='notice'>You dispose of the microwave contents.</span>")
 	src.updateUsrDialog()
 
@@ -434,17 +431,11 @@
 	ffuu.reagents.add_reagent(TOXIN, amount/10)
 	return ffuu
 
-/obj/machinery/microwave/CtrlClick(mob/user)
-    if(!user.incapacitated() && Adjacent(user) && user.dexterity_check() && anchored)
+/obj/machinery/microwave/AltClick(mob/user)
+    if(!user.incapacitated() && Adjacent(user) && user.dexterity_check())
         cook() //Cook checks for power, brokenness, and contents internally
         return
     return ..()
-
-/obj/machinery/microwave/AltClick(mob/user)
-	if(!user.incapacitated() && Adjacent(user) && user.dexterity_check())
-		dispose()
-		return
-	return ..()
 
 /obj/machinery/microwave/Topic(href, href_list)
 	if(..())
@@ -452,7 +443,7 @@
 
 	usr.set_machine(src)
 	if(src.operating)
-		updateUsrDialog()
+		src.updateUsrDialog()
 		return
 
 	switch(href_list["action"])
@@ -461,8 +452,4 @@
 
 		if ("dispose")
 			dispose()
-
-		if ("reagenttoggle")
-			reagent_disposal = !reagent_disposal
-			updateUsrDialog()
 	return

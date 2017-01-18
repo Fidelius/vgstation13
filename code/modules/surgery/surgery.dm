@@ -28,9 +28,7 @@
 	return 0
 
 /datum/surgery_step/proc/check_anesthesia(var/mob/living/carbon/human/target)
-	if(target.sleeping > 0 || target.stat)
-		return 1
-	if(!target.feels_pain())
+	if( (target.sleeping>0 || target.stat))
 		return 1
 	if(prob(25)) // Pain is tolerable?  Pomf wanted this. - N3X
 		return 1

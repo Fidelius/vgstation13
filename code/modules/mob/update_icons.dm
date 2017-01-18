@@ -62,9 +62,6 @@
 /mob/proc/update_inv_glasses()
 	return
 
-/mob/proc/update_hair()
-	return
-
 /mob/proc/update_inv_s_store()
 	return
 
