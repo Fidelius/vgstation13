@@ -52,7 +52,7 @@
 	if(clumsy_check)
 		if(istype(occupant, /mob/living))
 			var/mob/living/M = occupant
-			if(!clumsy_check(M) && M.dizziness < 450)
+			if(!(M_CLUMSY in M.mutations) && M.dizziness < 450)
 				return
 	occupant.Knockdown(2)
 	occupant.Stun(2)

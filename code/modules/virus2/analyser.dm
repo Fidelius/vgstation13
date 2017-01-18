@@ -67,6 +67,7 @@
 	dish.analysed = 1
 	if (D.virus2.addToDB())
 		say("Added new pathogen to database.")
+	PrintPaper(dish)
 	dish.forceMove(src.loc)
 	dish = null
 	icon_state = "analyser"
@@ -131,8 +132,8 @@
 			if(!B.analysed)
 				dat += "Awaiting analysis.</td><td></td><td></td>"
 			else
-				for(var/datum/disease2/effect/e in B.virus2.effects)
-					dat += "<br>[e.name]"
+				for(var/datum/disease2/effectholder/e in B.virus2.effects)
+					dat += "<br>[e.effect.name]"
 				dat +="</td>"
 				dat += "<td>[antigens2string(B.virus2.antigen)]</td>"
 				dat += "<td>[(B.virus2.spreadtype)]</td>"

@@ -50,16 +50,21 @@ In short:
 	*/
 
 	escape_list = get_area_turfs(locate(/area/hallway/secondary/exit))
-	CHECK_TICK
+	tcheck(80,1)
 	suspend_alert = 1
 
 	convert_all_parallax()
 	//separated into separate procs for profiling
 	AreaSet()
+	tcheck(80,1)
 	MiscSet()
+	tcheck(80,1)
 	APCSet()
+	tcheck(80,1)
 	KillMobs()
+	tcheck(80,1)
 	OverlayAndAmbientSet()
+	tcheck(80,1)
 	runedec += 9000	//basically removing the rune cap
 
 	ticker.StartThematic("endgame")
@@ -96,31 +101,38 @@ In short:
 */
 
 		A.updateicon()
-		CHECK_TICK
+		tcheck(80,1)
 
 /datum/universal_state/hell/OverlayAndAmbientSet()
 	set waitfor = FALSE
+	var/count = 0
 	for(var/turf/T in turfs)
+		count++
+		if(!(count % 50000))
+			sleep(world.tick_lag)
 		if(istype(T, /turf/space))
 			T.overlays += image(icon = T.icon, icon_state = "hell01")
 		else
 			if(!T.holy && prob(1) && T.z != CENTCOMM_Z)
 				new /obj/effect/gateway/active/cult(T)
 			T.underlays += "hell01"
-		CHECK_TICK
+		tcheck(85,1)
 
 	for(var/datum/lighting_corner/C in global.all_lighting_corners)
 		if (!C.active)
 			continue
+		count++
+		if(!(count % 200000))
+			sleep(world.tick_lag)
 
 		C.update_lumcount(0.5, 0, 0)
-		CHECK_TICK
+		tcheck(80,1)
 
 /datum/universal_state/hell/proc/MiscSet()
 	for (var/obj/machinery/firealarm/alm in machines)
 		if (!(alm.stat & BROKEN))
 			alm.ex_act(2)
-		CHECK_TICK
+		tcheck(80,1)
 
 /datum/universal_state/hell/proc/APCSet()
 	for (var/obj/machinery/power/apc/APC in power_machines)
@@ -130,20 +142,19 @@ In short:
 				APC.cell.charge = 0
 			APC.emagged = 1
 			APC.queue_icon_update()
-		CHECK_TICK
+		tcheck(85,1)
 
 /datum/universal_state/hell/proc/KillMobs()
 	for(var/mob/living/simple_animal/M in mob_list)
 		if(M && !M.client)
 			M.Die()
-		CHECK_TICK
+		tcheck(80,1)
 
 /datum/universal_state/hell/proc/convert_all_parallax()
 	for(var/client/C in clients)
 		var/obj/screen/plane_master/parallax_spacemaster/PS = locate() in C.screen
 		if(PS)
 			convert_parallax(PS)
-		CHECK_TICK
 
 /datum/universal_state/hell/convert_parallax(obj/screen/plane_master/parallax_spacemaster/PS)
 	PS.color = list(

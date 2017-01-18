@@ -250,7 +250,7 @@
 									"<span class='notice'>[bicon(src)] You transplant \the [seed.display_name] into \the [C].</span>",
 									"<span class='notice'>You hear a ratchet.</span>")
 
-			var/obj/structure/flora/pottedplant/claypot/S = new(get_turf(C))
+			var/obj/structure/claypot/S = new(get_turf(C))
 			transfer_fingerprints(C, S)
 			qdel(C)
 
@@ -268,7 +268,6 @@
 				S.overlays += image(seed.plant_dmi,"[seed.plant_icon]-grow[seed.growth_stages]")
 
 			S.plant_name = seed.display_name
-			S.name = "potted [S.plant_name]"
 
 			if(seed.biolum)
 				S.set_light(round(seed.potency/10))
@@ -368,7 +367,7 @@
 			component_parts.len = 0
 			qdel(src)
 
-	else if((O.sharpness_flags & (SHARP_BLADE|SERRATED_BLADE)) && harvest)
+	else if(O.is_sharp() && harvest)
 		attack_hand(user)
 
 	else

@@ -23,7 +23,7 @@
 	throw_range = 20
 
 /obj/item/device/taperecorder/Hear(var/datum/speech/speech, var/rendered_speech="")
-	if(recording && speech.speaker != src)
+	if(recording)
 		timestamp += timerecorded
 		storedinfo += "\[[time2text(timerecorded*10,"mm:ss")]\] \"[html_encode(speech.message)]\""
 
@@ -243,4 +243,4 @@
 			return
 
 /obj/item/device/taperecorder/proc/recorder_message(var/msg)
-	say(msg, class = "maroon")
+	visible_message("<font color=Maroon><B>Tape Recorder</B>: [msg]</font>")

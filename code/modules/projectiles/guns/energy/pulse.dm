@@ -33,6 +33,9 @@
 				projectile_type = "/obj/item/projectile/beam/pulse"
 		return
 
+	isHandgun()
+		return 0
+
 /obj/item/weapon/gun/energy/pulse_rifle/cyborg/process_chambered()
 	if(in_chamber)
 		return 1
@@ -63,5 +66,5 @@
 	inhand_states = list("left_hand" = 'icons/mob/in-hand/left/guninhands_left.dmi', "right_hand" = 'icons/mob/in-hand/right/guninhands_right.dmi')
 	cell_type = "/obj/item/weapon/cell/infinite"
 
-/obj/item/weapon/gun/energy/pulse_rifle/M1911/isHandgun()
-	return TRUE
+	isHandgun()
+		return 1

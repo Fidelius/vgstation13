@@ -55,9 +55,3 @@
 
 /turf/simulated/wall/invulnerable/ex_act(severity)
 	return // :^)
-
-/turf/simulated/wall/invulnerable/ice
-	name = "blue ice wall"
-	desc = "The incredible compressive forces that formed this sturdy ice wall gave it a blue color."
-	icon_state = "ice"
-	walltype = "ice"

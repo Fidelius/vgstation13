@@ -148,7 +148,7 @@
 				B.name = "The Odyssey"
 				J = "Oracle"
 				deity_name = pick("Zeus", "Poseidon", "Athena", "Persephone", "Ares", "Apollo")
-			if("latin", "rome", "roma", "roman")
+			if("Latin", "Rome", "Roma", "Roman")
 				B.name = "Cult of Rome"
 				H.equip_or_collect(new /obj/item/clothing/head/helmet/roman/legionaire(H), slot_head)
 				H.equip_or_collect(new /obj/item/clothing/under/roman(H), slot_w_uniform)
@@ -321,7 +321,7 @@
 			if("communism", "socialism")
 				B.name = "The Communist Manifesto"
 				J = "Komrade"
-				deity_name = "Karl Marx"
+				deity_name = "Karl Max"
 				H.equip_or_collect(new /obj/item/clothing/head/russofurhat(H), slot_head)
 				H.equip_or_collect(new /obj/item/clothing/suit/russofurcoat(H), slot_wear_suit)
 			if("capitalism", "free market", "liberalism", "money")

@@ -7,7 +7,7 @@
 	var/image/secondary_buckle_overlay = null // for those really complicated chairs
 	var/noghostspin = 0 //Set it to 1 if ghosts should NEVER be able to spin this
 
-	lock_type = /datum/locking_category/buckle/chair
+	lock_type = /datum/locking_category/chair
 
 /obj/structure/bed/chair/New()
 	..()
@@ -166,7 +166,7 @@
 
 /obj/structure/bed/chair/comfy/update_icon()
 	..()
-	if(is_locking(lock_type))
+	if(locked_atoms.len)
 		overlays += buckle_overlay
 		if(secondary_buckle_overlay)
 			overlays += secondary_buckle_overlay
@@ -195,7 +195,7 @@
 	return ..()
 
 /obj/structure/bed/chair/comfy/attack_hand(var/mob/user)
-	if(is_locking(lock_type))
+	if(locked_atoms.len)
 		return ..()
 
 	for (var/obj/item/I in src)
@@ -240,7 +240,7 @@
 
 /obj/structure/bed/chair/office/update_icon()
 	..()
-	if(is_locking(lock_type))
+	if(locked_atoms.len)
 		overlays += buckle_overlay
 	else
 		overlays -= buckle_overlay
@@ -249,7 +249,7 @@
 
 
 /obj/structure/bed/chair/office/handle_layer() // Fixes layer problem when and office chair is buckled and facing north
-	if(dir == NORTH && !is_locking(lock_type))
+	if(dir == NORTH && !locked_atoms.len)
 		layer = CHAIR_ARMREST_LAYER
 		plane = ABOVE_HUMAN_PLANE
 	else
@@ -267,7 +267,7 @@
 
 
 // Subtype only for seperation purposes.
-/datum/locking_category/buckle/chair
+/datum/locking_category/chair
 
 
 // Couches, offshoot of /comfy/ so that the armrest code can be used easily
@@ -294,7 +294,6 @@
 	secondary_buckle_overlay.appearance_flags = RESET_COLOR
 	..()
 	overlays += buckle_overlay
-	handle_layer()
 
 
 /obj/structure/bed/chair/comfy/couch/turn/handle_layer() // makes sure mobs arent buried under certain chair sprites

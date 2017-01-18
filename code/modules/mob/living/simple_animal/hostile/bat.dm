@@ -40,7 +40,6 @@
 
 	faction = "scarybat"
 	var/mob/living/owner
-	held_items = list()
 
 /mob/living/simple_animal/hostile/scarybat/New(loc, mob/living/L as mob)
 	..()

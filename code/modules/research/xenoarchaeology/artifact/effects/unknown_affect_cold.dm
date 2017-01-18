@@ -3,7 +3,6 @@
 /datum/artifact_effect/cold
 	effecttype = "cold"
 	var/target_temp
-	copy_for_battery = list("target_temp")
 
 /datum/artifact_effect/cold/New()
 	..()

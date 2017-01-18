@@ -144,8 +144,3 @@
 		if(speaking.name == L.name)
 			return 1
 	return 0
-
-/mob/proc/can_read()
-	if(stat == DEAD || universal_understand)
-		return TRUE
-	return FALSE

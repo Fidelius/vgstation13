@@ -95,6 +95,8 @@
 		if(beaker)
 			beaker.forceMove(src.loc)
 			beaker = null
+	if(!dish)
+		return
 	if (href_list["power"])
 		on = !on
 		if(on)
@@ -127,7 +129,8 @@
 				var/datum/disease2/disease/D = dish.virus2.getcopy()
 				D.log += "<br />[timestamp()] Injected into blood via [src] by [key_name(usr)]"
 				var/list/virus = list("[dish.virus2.uniqueID]" = D)
-				B.data["virus2"] += virus
+				B.data["virus2"] = virus
+
 				say("Injection complete.")
 	src.add_fingerprint(usr)
 	src.updateUsrDialog()
@@ -170,39 +173,39 @@
 	onclose(user, "dish_incubator")
 
 /obj/machinery/disease2/incubator/process()
-	if(on)
+	if(dish && on && dish.virus2)
 		use_power(50,EQUIP)
 		if(!powered(EQUIP))
 			on = 0
 			icon_state = "incubator"
-		if (dish && dish.virus2)
+		if(foodsupply)
+			foodsupply -= 1
+			dish.growth = min(growthrate + dish.growth, INCUBATOR_MAX_SIZE)
 			if(dish.growth >= INCUBATOR_MAX_SIZE)
 				if(icon_state != "incubator_fed")
 					icon_state = "incubator_fed"
 				if(last_notice + FED_PING_DELAY < world.time)
 					last_notice = world.time
 					alert_noise("ping")
-			if(foodsupply)
-				foodsupply -= 1
-				dish.growth = min(growthrate + dish.growth, INCUBATOR_MAX_SIZE)
-			if(radiation)
-				if(radiation > 50 & prob(mutatechance))
-					dish.virus2.log += "<br />[timestamp()] MAJORMUTATE (incubator rads)"
-					dish.virus2.majormutate()
-					if(dish.info && dish.analysed)
-						dish.info = "OUTDATED : [dish.info]"
-						dish.analysed = 0
-					alert_noise("beep")
-					flick("incubator_mut", src)
+		if(radiation)
+			if(radiation > 50 & prob(mutatechance))
+				dish.virus2.log += "<br />[timestamp()] MAJORMUTATE (incubator rads)"
+				dish.virus2.majormutate()
+				if(dish.info)
+					dish.info = "OUTDATED : [dish.info]"
+					dish.analysed = 0
+				alert_noise("beep")
+				flick("incubator_mut", src)
 
-				else if(prob(mutatechance))
-					dish.virus2.minormutate()
-				radiation -= 1
-			if(toxins && prob(5))
-				dish.virus2.infectionchance -= 1
-			if(toxins > 50)
-				dish.virus2 = null
-	else
+			else if(prob(mutatechance))
+				dish.virus2.minormutate()
+			radiation -= 1
+		if(toxins && prob(5))
+			dish.virus2.infectionchance -= 1
+		if(toxins > 50)
+			dish.virus2 = null
+	else if(!dish)
+		on = 0
 		icon_state = "incubator"
 
 	if(beaker)

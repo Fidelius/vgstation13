@@ -58,7 +58,7 @@ var/global/list/obj/machinery/message_server/message_servers = list()
 
 	var/list/datum/data_pda_msg/pda_msgs = list()
 	var/list/datum/data_rc_msg/rc_msgs = list()
-	var/disabled = FALSE
+	var/active = 1
 	var/decryptkey = "password"
 
 /obj/machinery/message_server/New()
@@ -66,7 +66,6 @@ var/global/list/obj/machinery/message_server/message_servers = list()
 	decryptkey = GenerateKey()
 	send_pda_message("System Administrator", "system", "This is an automated message. The messaging system is functioning correctly.")
 	..()
-	update_icon()
 	return
 
 /obj/machinery/message_server/Destroy()
@@ -82,8 +81,14 @@ var/global/list/obj/machinery/message_server/message_servers = list()
 	newKey += pick("1", "2", "3", "4", "5", "6", "7", "8", "9", "0")
 	return newKey
 
-/obj/machinery/message_server/proc/is_functioning()
-	return !disabled && !(stat & (BROKEN|NOPOWER))
+/obj/machinery/message_server/process()
+	//if(decryptkey == "password")
+	//	decryptkey = generateKey()
+	if(active && (stat & (BROKEN|NOPOWER)))
+		active = 0
+		return
+	update_icon()
+	return
 
 /obj/machinery/message_server/proc/send_pda_message(var/recipient = "",var/sender = "",var/message = "")
 	pda_msgs += new/datum/data_pda_msg(recipient,sender,message)
@@ -95,20 +100,16 @@ var/global/list/obj/machinery/message_server/message_servers = list()
 	if(isobserver(user) && !isAdminGhost(user))
 		return 0
 //	to_chat(user, "<span class='notice'>There seem to be some parts missing from this server. They should arrive on the station in a few days, give or take a few CentCom delays.</span>")
-	to_chat(user, "You toggle PDA message passing from [disabled ? "Off" : "On"] to [disabled ? "On" : "Off"]")
-	disabled = !disabled
+	to_chat(user, "You toggle PDA message passing from [active ? "On" : "Off"] to [active ? "Off" : "On"]")
+	active = !active
 	update_icon()
 
 	return
 
-/obj/machinery/message_server/power_change()
-	. = ..()
-	update_icon()
-
 /obj/machinery/message_server/update_icon()
-	if(stat & (BROKEN|NOPOWER))
+	if((stat & (BROKEN|NOPOWER)))
 		icon_state = "server-nopower"
-	else if (disabled)
+	else if (!active)
 		icon_state = "server-off"
 	else
 		icon_state = "server-on"

@@ -14,7 +14,11 @@
 	projectile_type = "/obj/item/projectile/ion"
 
 /obj/item/weapon/gun/energy/ionrifle/emp_act(severity)
-	return
+	if(severity <= 2)
+		power_supply.use(round(power_supply.maxcharge / severity))
+		update_icon()
+	else
+		return
 
 /obj/item/weapon/gun/energy/decloner
 	name = "biological demolecularisor"
@@ -44,9 +48,6 @@
 		qdel(src)
 		return 0
 	return ..()
-
-/obj/item/weapon/gun/energy/decloner/isHandgun()
-	return TRUE
 
 var/available_staff_transforms=list("monkey","robot","slime","xeno","human","furry","frankenstein")
 #define SOC_CHANGETYPE_COOLDOWN 2 MINUTES
@@ -242,9 +243,6 @@ var/available_staff_transforms=list("monkey","robot","slime","xeno","human","fur
 	var/charge_tick = 0
 	var/mode = 0 //0 = mutate, 1 = yield boost, 2 = emag-mutate
 	var/mutstrength = 10 //how many units of mutagen will the mutation projectile act as
-
-/obj/item/weapon/gun/energy/floragun/isHandgun()
-	return TRUE
 
 /obj/item/weapon/gun/energy/floragun/New()
 	..()
@@ -482,9 +480,6 @@ obj/item/weapon/gun/energy/staff/focus/attack_self(mob/living/user as mob)
 	var/charge_tick = 0
 	projectile_type = "/obj/item/projectile/energy/rad"
 
-/obj/item/weapon/gun/energy/radgun/isHandgun()
-	return TRUE
-
 /obj/item/weapon/gun/energy/radgun/New()
 	..()
 	processing_objects.Add(src)
@@ -539,9 +534,6 @@ obj/item/weapon/gun/energy/ricochet/Fire(atom/target as mob|obj|turf|area, mob/l
 	fire_sound = 'sound/weapons/bison_fire.ogg'
 	var/pumping = 0
 
-/obj/item/weapon/gun/energy/bison/isHandgun()
-	return TRUE
-
 /obj/item/weapon/gun/energy/bison/New()
 	..()
 	power_supply.charge = 0
@@ -591,9 +583,6 @@ obj/item/weapon/gun/energy/ricochet/Fire(atom/target as mob|obj|turf|area, mob/l
 	inhand_states = list("left_hand" = 'icons/mob/in-hand/left/guns_experimental.dmi', "right_hand" = 'icons/mob/in-hand/right/guns_experimental.dmi')
 	recoil = 1
 	var/firelevel = SPUR_FULL_POWER
-
-/obj/item/weapon/gun/energy/polarstar/isHandgun()
-	return TRUE
 
 /obj/item/weapon/gun/energy/polarstar/New()
 	..()

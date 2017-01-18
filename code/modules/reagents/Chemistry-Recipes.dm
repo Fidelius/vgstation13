@@ -173,7 +173,7 @@
 	id = OXYCODONE
 	result = OXYCODONE
 	required_reagents = list(ETHANOL = 1, TRAMADOL = 1, PLASMA = 1)
-	result_amount = 3
+	result_amount = 1
 
 ///datum/chemical_reaction/cyanide
 //	name = "Cyanide"
@@ -602,94 +602,26 @@
 	G.adjust(0,0,0,vol)
 	..()
 
-/datum/chemical_reaction/solidification
-	name = "Metal solidification"
-	id = "metalsolid"
-	result = null
-	required_reagents = list(SILICATE = 10, FROSTOIL = 10, IRON = 20)
-	result_amount = 1
-
-/datum/chemical_reaction/solidification/on_reaction(var/datum/reagents/holder, var/obj/item/stack/sheet/to_spawn)
-	var/location = get_turf(holder.my_atom)
-	new to_spawn(location, result_amount)
-
-/datum/chemical_reaction/solidification/plasma
+/datum/chemical_reaction/plasmasolidification
 	name = "Solid Plasma"
 	id = "solidplasma"
 	result = null
-	required_reagents = list(SILICATE = 10, FROSTOIL = 10, PLASMA = 20)
+	required_reagents = list(IRON = 5, FROSTOIL = 5, PLASMA = 20)
 	result_amount = 1
 
-/datum/chemical_reaction/solidification/plasma/on_reaction(var/datum/reagents/holder, var/obj/item/stack/sheet/to_spawn)
-	to_spawn = /obj/item/stack/sheet/mineral/plasma
-	..()
+/datum/chemical_reaction/plasmasolidification/on_reaction(var/datum/reagents/holder, var/created_volume)
+	var/location = get_turf(holder.my_atom)
+	new /obj/item/stack/sheet/mineral/plasma(location)
 
-
-/datum/chemical_reaction/solidification/iron
-	name = "Solid Metal"
-	id = "solidmetal"
-	result = null
-	required_reagents = list(SILICATE = 10, FROSTOIL = 10, IRON = 20)
-	result_amount = 1
-
-/datum/chemical_reaction/solidification/iron/on_reaction(var/datum/reagents/holder, var/obj/item/stack/sheet/to_spawn)
-	to_spawn = /obj/item/stack/sheet/metal
-	..()
-
-/datum/chemical_reaction/solidification/silver
-	name = "Solid Silver"
-	id = "solidsilver"
-	result = null
-	required_reagents = list(SILICATE = 10, FROSTOIL = 10, SILVER = 20)
-	result_amount = 1
-
-/datum/chemical_reaction/solidification/silver/on_reaction(var/datum/reagents/holder, var/obj/item/stack/sheet/to_spawn)
-	to_spawn = /obj/item/stack/sheet/mineral/silver
-	..()
-
-/datum/chemical_reaction/solidification/gold
-	name = "Solid Gold"
-	id = "solidgold"
-	result = null
-	required_reagents = list(SILICATE = 10, FROSTOIL = 10, GOLD = 20)
-	result_amount = 1
-
-/datum/chemical_reaction/solidification/gold/on_reaction(var/datum/reagents/holder, var/obj/item/stack/sheet/to_spawn)
-	to_spawn = /obj/item/stack/sheet/mineral/gold
-	..()
-
-/datum/chemical_reaction/solidification/uranium
-	name = "Solid Uranium"
-	id = "soliduranium"
-	result = null
-	required_reagents = list(SILICATE = 10, FROSTOIL = 10, URANIUM = 20)
-	result_amount = 1
-
-/datum/chemical_reaction/solidification/uranium/on_reaction(var/datum/reagents/holder, var/obj/item/stack/sheet/to_spawn)
-	to_spawn = /obj/item/stack/sheet/mineral/uranium
-	..()
-
-/datum/chemical_reaction/solidification/plasteel
-	name = "Solid Plasteel"
-	id = "solidplasteel"
-	result = null
-	required_reagents = list(SILICATE = 10, FROSTOIL = 5, CAPSAICIN = 5, PLASMA = 10, IRON = 10)
-	result_amount = 1
-
-/datum/chemical_reaction/solidification/plasteel/on_reaction(var/datum/reagents/holder, var/obj/item/stack/sheet/to_spawn)
-	to_spawn = /obj/item/stack/sheet/plasteel
-	..()
-
-/datum/chemical_reaction/solidification/plastic
+/datum/chemical_reaction/plastication
 	name = "Plastic"
 	id = "solidplastic"
 	result = null
 	required_reagents = list(PACID = 10, PLASTICIDE = 20)
-	result_amount = 10
+	result_amount = 1
 
-/datum/chemical_reaction/solidification/plastic/on_reaction(var/datum/reagents/holder, var/obj/item/stack/sheet/to_spawn)
-	to_spawn = /obj/item/stack/sheet/mineral/plastic
-	..()
+/datum/chemical_reaction/plastication/on_reaction(var/datum/reagents/holder)
+	new /obj/item/stack/sheet/mineral/plastic(get_turf(holder.my_atom), 10)
 
 /datum/chemical_reaction/condensedcapsaicin
 	name = "Condensed Capsaicin"
@@ -2075,14 +2007,6 @@
 	required_reagents = list(CAPSAICIN = 1, HOT_RAMEN = 6)
 	result_amount = 6
 
-/datum/chemical_reaction/ice
-	name = "Ice"
-	id = ICE
-	result = ICE
-	required_reagents = list(WATER = 10)
-	required_catalysts = list(FROSTOIL = 5)
-	result_amount = 11
-
 ////////////////////////////////////////// COCKTAILS //////////////////////////////////////
 
 /datum/chemical_reaction/goldschlager
@@ -2716,7 +2640,7 @@
 	name = "Tonio"
 	id = TONIO
 	result = TONIO
-	required_reagents = list(COFFEE = 5, LIMEJUICE = 1, TOMATOJUICE = 1, LEMONJUICE = 1, WATERMELONJUICE = 1, HONEY = 1)
+	required_reagents = list(COFFEE = 5, LIMEJUICE = 1, TOMATOJUICE = 1, LEMONJUICE = 1, WATERMELONJUICE = 1, "honey" = 1)
 	result_amount = 10
 
 /datum/chemical_reaction/doppio
@@ -2730,7 +2654,7 @@
 	name = "Passione"
 	id = PASSIONE
 	result = PASSIONE
-	required_reagents = list(CAPPUCCINO = 5, GOLD = 1, HONEY =5)
+	required_reagents = list(CAPPUCCINO = 5, GOLD = 1, "honey" =5)
 	result_amount = 10
 
 /datum/chemical_reaction/seccoffee

@@ -23,12 +23,7 @@
 		to_chat(user, "<span class='warning'>The borg must choose a module before he can be upgraded!</span>")
 		return FAILED_TO_ADD
 
-
-	if(isMoMMI(R))
-		if(!add_to_mommis)
-			to_chat(user, "<span class='warning'>\The [src] only functions on Nanotrasen Cyborgs.</span>")
-			return FAILED_TO_ADD
-	else if(required_module.len)
+	if(required_module.len)
 		if(!(R.module.type in required_module))
 			to_chat(user, "<span class='warning'>\The [src] will not fit into \the [R.module.name]!</span>")
 			return FAILED_TO_ADD
@@ -39,6 +34,10 @@
 
 	if(!R.opened)
 		to_chat(user, "<span class='warning'>You must first open \the [src]'s cover!</span>")
+		return FAILED_TO_ADD
+
+	if(isMoMMI(R) && !add_to_mommis)
+		to_chat(user, "<span class='warning'>\The [src] only functions on Nanotrasen Cyborgs.</span>")
 		return FAILED_TO_ADD
 
 	if(!multi_upgrades && (src.type in R.module.upgrades))

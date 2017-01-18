@@ -1,7 +1,7 @@
 /turf
 	icon = 'icons/turf/floors.dmi'
 	plane = TURF_PLANE
-	layer = TURF_LAYER
+	layer = TURF_LAYER_MEME_NAME_BECAUSE_CELT_IS_A_FUCKING_RETARD
 	luminosity = 0
 
 	//for floors, use is_plating(), is_plasteel_floor() and is_light_floor()
@@ -60,8 +60,7 @@
 	// This is the placed to store data for the holomap.
 	var/list/image/holomap_data
 
-	// Map element which spawned this turf
-	var/datum/map_element/map_element
+
 
 /turf/examine(mob/user)
 	..()
@@ -69,7 +68,6 @@
 		to_chat(user, "It has bullet markings on it.")
 
 /turf/proc/process()
-	set waitfor = FALSE
 	universe.OnTurfTick(src)
 
 /turf/New()
@@ -155,7 +153,7 @@
 
 			if(istype(A, /obj/structure/bed/chair/vehicle))
 				var/obj/structure/bed/chair/vehicle/B = A
-				if(B.is_locking(B.lock_type))
+				if(B.locked_atoms.len)
 					contents_brought += recursive_type_check(B)
 
 			var/locked_to_current_z = 0//To prevent the moveable atom from leaving this Z, examples are DAT DISK and derelict MoMMIs.
@@ -375,17 +373,16 @@
 		. = W
 
 	recalc_atom_opacity()
-	if (SSlighting && SSlighting.initialized)
-		lighting_overlay = old_lighting_overlay
-		affecting_lights = old_affecting_lights
-		corners = old_corners
-		if((old_opacity != opacity) || (dynamic_lighting != old_dynamic_lighting) || force_lighting_update)
-			reconsider_lights()
-		if(dynamic_lighting != old_dynamic_lighting)
-			if(dynamic_lighting)
-				lighting_build_overlay()
-			else
-				lighting_clear_overlay()
+	lighting_overlay = old_lighting_overlay
+	affecting_lights = old_affecting_lights
+	corners = old_corners
+	if((old_opacity != opacity) || (dynamic_lighting != old_dynamic_lighting) || force_lighting_update)
+		reconsider_lights()
+	if(dynamic_lighting != old_dynamic_lighting)
+		if(dynamic_lighting)
+			lighting_build_overlay()
+		else
+			lighting_clear_overlay()
 
 	holomap_data = old_holomap // Holomap persists through everything...
 	update_holomap_planes() // But we might need to recalculate it.
@@ -709,8 +706,3 @@
 		change_area(old_area, A)
 		for(var/atom/AM in contents)
 			AM.change_area(old_area, A)
-
-/turf/spawned_by_map_element(datum/map_element/ME, list/objects)
-	.=..()
-
-	src.map_element = ME

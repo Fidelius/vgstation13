@@ -58,7 +58,7 @@
 						continue
 					qdel(A)
 					A = null
-				CHECK_TICK
+				tcheck(80,1)
 			T.ChangeTurf(type)
 			var/turf/unsimulated/wall/supermatter/SM = T
 			if(SM.avail_dirs)
@@ -123,6 +123,3 @@
 
 /turf/unsimulated/wall/supermatter/singularity_act()
 	return
-
-/turf/unsimulated/wall/supermatter/no_spread
-	avail_dirs = list()

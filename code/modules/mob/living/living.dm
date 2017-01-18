@@ -402,9 +402,9 @@
 		for(var/obj/item/weapon/storage/S in src.contents)	//Check for storage items
 			L += get_contents(S)
 		for(var/obj/item/clothing/suit/storage/S in src.contents)//Check for labcoats and jackets
-			L += get_contents(S.hold)
+			L += get_contents(S)
 		for(var/obj/item/clothing/accessory/storage/S in src.contents)//Check for holsters
-			L += get_contents(S.hold)
+			L += get_contents(S)
 		for(var/obj/item/weapon/gift/G in src.contents) //Check for gift-wrapped items
 			L += G.gift
 			if(istype(G.gift, /obj/item/weapon/storage))
@@ -435,9 +435,6 @@
 	for(var/obj/O in L)
 		O.emp_act(severity)
 	..()
-
-/mob/living/proc/get_organ(zone)
-	return
 
 /mob/living/proc/get_organ_target()
 	var/t = src.zone_sel.selecting
@@ -527,6 +524,7 @@ Thanks.
 	remove_jitter()
 	germ_level = 0
 	next_pain_time = 0
+	traumatic_shock = 0
 	radiation = 0
 	nutrition = 400
 	bodytemperature = 310
@@ -554,7 +552,7 @@ Thanks.
 		H.timeofdeath = 0
 		H.vessel.reagent_list = list()
 		H.vessel.add_reagent(BLOOD,560)
-		H.pain_shock_stage = 0
+		H.shock_stage = 0
 		spawn(1)
 			H.fixblood()
 		for(var/organ_name in H.organs_by_name)
@@ -632,7 +630,7 @@ Thanks.
 
 /mob/living/Move(atom/newloc, direct)
 	if (locked_to && locked_to.loc != newloc)
-		var/datum/locking_category/category = locked_to.get_lock_cat_for(src)
+		var/datum/locking_category/category = locked_to.locked_atoms[src]
 		if (locked_to.anchored || category.flags & CANT_BE_MOVED_BY_LOCKED_MOBS)
 			return 0
 		else
@@ -643,7 +641,7 @@ Thanks.
 
 	var/turf/T = loc
 
-	var/t7 = 1 //What the FUCK is this variable?
+	var/t7 = 1
 	if (restrained())
 		for(var/mob/living/M in range(src, 1))
 			if ((M.pulling == src && M.stat == 0 && !( M.restrained() )))
@@ -990,20 +988,6 @@ Thanks.
 						BD.attack_hand(usr)
 					C.open()
 
-	if(src.loc && istype(src.loc, /obj/item/mecha_parts/mecha_equipment/tool/jail))
-		var/breakout_time = 30 SECONDS
-		var/obj/item/mecha_parts/mecha_equipment/tool/jail/jailcell = src.loc
-		L.delayNext(DELAY_ALL,100)
-		L.visible_message("<span class='danger'>One of \the [src.loc]'s cells rattles.</span>","<span class='warning'>You press against the lid of \the [src.loc] and attempt to pop it open (this will take about [breakout_time/10] seconds).</span>")
-		spawn(0)
-			if(do_after(usr,src,breakout_time)) //minutes * 60seconds * 10deciseconds
-				if(src.loc != jailcell || !L || L.stat != CONSCIOUS) //if we're no longer in that mounted cell OR user dead/unconcious
-					return
-
-				//Well then break it!
-				jailcell.break_out(L)
-		return
-
 
 	else if(iscarbon(L))
 		var/mob/living/carbon/CM = L
@@ -1231,11 +1215,11 @@ Thanks.
 			var/mob/living/carbon/human/H = null
 			if(ishuman(tmob))
 				H = tmob
-			if(H && ((M_FAT in H.mutations) || (H && H.species && H.species.anatomy_flags & IS_BULKY)))
+			if(H && ((M_FAT in H.mutations) || (H && H.species && H.species.flags & IS_BULKY)))
 				var/mob/living/carbon/human/U = null
 				if(ishuman(src))
 					U = src
-				if(prob(40) && !(U && ((M_FAT in U.mutations) || (U && U.species && U.species.anatomy_flags & IS_BULKY))))
+				if(prob(40) && !(U && ((M_FAT in U.mutations) || (U && U.species && U.species.flags & IS_BULKY))))
 					to_chat(src, "<span class='danger'>You fail to push [tmob]'s fat ass out of the way.</span>")
 					now_pushing = 0
 					return
@@ -1279,11 +1263,7 @@ Thanks.
 	if(!meat_type)
 		return 0
 
-	var/obj/item/weapon/reagent_containers/food/snacks/meat/M
-	if(istype(src, /mob/living/carbon/human))
-		M = new meat_type(location, src)
-	else
-		M = new meat_type(location)
+	var/obj/item/weapon/reagent_containers/food/snacks/meat/M = new meat_type(location)
 	var/obj/item/weapon/reagent_containers/food/snacks/meat/animal/A = M
 
 	if(istype(A))
@@ -1325,14 +1305,11 @@ Thanks.
 	var/obj/item/tool = null	//The tool that is used for butchering
 	var/speed_mod = 1.0			//The higher it is, the faster you butcher
 	var/butchering_time = 20 * size //2 seconds for tiny animals, 4 for small ones, 6 for normal sized ones (+ humans), 8 for big guys and 10 for biggest guys
-	var/tool_name = null
 
 	if(ishuman(user))
 		var/mob/living/carbon/human/H = user
 
 		tool = H.get_active_hand()
-		if(tool)
-			tool_name = tool.name
 		if(tool)
 			speed_mod = tool.is_sharp()
 			if(!speed_mod)
@@ -1341,27 +1318,16 @@ Thanks.
 		else
 			speed_mod = 0.0
 
+		if(M_CLAWS in H.mutations)
+			if(!istype(H.gloves))
+				speed_mod += 0.25
 		if(M_BEAK in H.mutations)
 			if(istype(H.wear_mask))
 				var/obj/item/clothing/mask/M = H.wear_mask
 				if(!(M.body_parts_covered & MOUTH)) //If our mask doesn't cover mouth, we can use our beak to help us while butchering
 					speed_mod += 0.25
-					if(!tool_name)
-						tool_name = "beak"
 			else
 				speed_mod += 0.25
-				if(!tool_name)
-					tool_name = "beak"
-
-		if(M_CLAWS in H.mutations)
-			if(!istype(H.gloves))
-				speed_mod += 0.25
-				if(!tool_name)
-					tool_name = "claws"
-
-		if(isgrue(H))
-			tool_name = "grue"
-			speed_mod += 0.5
 	else
 		speed_mod = 0.5
 
@@ -1415,10 +1381,6 @@ Thanks.
 	src.drop_meat(get_turf(src))
 	src.meat_taken++
 	src.being_butchered = 0
-	if(tool_name)
-		if(!advanced_butchery)
-			advanced_butchery = new()
-		advanced_butchery.Add(tool_name)
 
 	if(src.meat_taken < src.meat_amount)
 		to_chat(user, "<span class='info'>You cut a chunk of meat out of \the [src].</span>")
@@ -1469,4 +1431,7 @@ Thanks.
 	if(override_blindness_check || !(disabilities & BLIND))
 		// flick("e_flash", flash)
 		overlay_fullscreen("flash", type)
+		// addtimer(src, "clear_fullscreen", 25, FALSE, "flash", 25)
+		spawn(25)
+			clear_fullscreen("flash", 25)
 		return 1

@@ -33,7 +33,7 @@
 
 /mob/camera/blob/verb/create_shield_power()
 	set category = "Blob"
-	set name = "Create Shield Blob"
+	set name = "Create Shield Blob (10)"
 	set desc = "Create a shield blob."
 
 	var/turf/T = get_turf(src)
@@ -52,7 +52,7 @@
 		to_chat(src, "Unable to use this blob, find a normal one.")
 		return
 
-	if(!can_buy(BLOBSHICOST))
+	if(!can_buy(10))
 		return
 
 
@@ -63,7 +63,7 @@
 
 /mob/camera/blob/verb/create_resource()
 	set category = "Blob"
-	set name = "Create Resource Blob"
+	set name = "Create Resource Blob (40)"
 	set desc = "Create a resource tower which will generate points for you."
 
 
@@ -86,7 +86,7 @@
 		to_chat(src, "There is a resource blob nearby, move more than 4 tiles away from it!")
 		return
 
-	if(!can_buy(BLOBRESCOST))
+	if(!can_buy(40))
 		return
 
 
@@ -100,7 +100,7 @@
 
 /mob/camera/blob/proc/create_core()
 	set category = "Blob"
-	set name = "Create Core Blob"
+	set name = "Create Core Blob (100)"
 	set desc = "Create another Core Blob to aid in the station takeover"
 
 
@@ -122,11 +122,8 @@
 	for(var/obj/effect/blob/core/blob in orange(15))
 		to_chat(src, "There is another core blob nearby, move more than 15 tiles away from it!")
 		return
-	var/number_of_cores = blob_cores.len
-	var/cost = BLOBCOREBASECOST+(BLOBCORECOSTINC*(number_of_cores-1))
 
-	if(!can_buy(cost))
-		to_chat(src, "Current cost of a blob core is [cost]!")
+	if(!can_buy(100))
 		return
 
 
@@ -136,7 +133,7 @@
 
 /mob/camera/blob/verb/create_node()
 	set category = "Blob"
-	set name = "Create Node Blob"
+	set name = "Create Node Blob (60)"
 	set desc = "Create a Node."
 
 
@@ -159,7 +156,7 @@
 		to_chat(src, "There is another node nearby, move more than 5 tiles away from it!")
 		return
 
-	if(!can_buy(BLOBNODCOST))
+	if(!can_buy(60))
 		return
 
 
@@ -169,13 +166,12 @@
 		N.overmind = src
 		special_blobs += N
 		update_specialblobs()
-		max_blob_points += BLOBNDPOINTINC
 	return
 
 
 /mob/camera/blob/verb/create_factory()
 	set category = "Blob"
-	set name = "Create Factory Blob"
+	set name = "Create Factory Blob (60)"
 	set desc = "Create a Spore producing blob."
 
 
@@ -197,7 +193,7 @@
 		to_chat(src, "There is a factory blob nearby, move more than 7 tiles away from it!")
 		return
 
-	if(!can_buy(BLOBFACCOST))
+	if(!can_buy(60))
 		return
 
 	B.change_to(/obj/effect/blob/factory)
@@ -258,7 +254,7 @@
 
 /mob/camera/blob/verb/expand_blob_power()
 	set category = "Blob"
-	set name = "Expand/Attack Blob"
+	set name = "Expand/Attack Blob (5)"
 	set desc = "Attempts to create a new blob in this tile. If the tile isn't clear we will attack it, which might clear it."
 
 	var/turf/T = get_turf(src)
@@ -278,7 +274,7 @@
 		to_chat(src, "There is no blob adjacent to you.")
 		return
 
-	if(!can_buy(BLOBATTCOST))
+	if(!can_buy(5))
 		return
 	OB.expand(T, 0)
 	return
@@ -286,7 +282,7 @@
 
 /mob/camera/blob/verb/rally_spores_power()
 	set category = "Blob"
-	set name = "Rally Spores"
+	set name = "Rally Spores (5)"
 	set desc = "Rally the spores to move to your location."
 
 	var/turf/T = get_turf(src)
@@ -295,7 +291,7 @@
 /mob/camera/blob/proc/rally_spores(var/turf/T)
 
 
-	if(!can_buy(BLOBRALCOST))
+	if(!can_buy(5))
 		return
 
 	to_chat(src, "You rally your spores.")
@@ -310,20 +306,12 @@
 			BS.Goto(pick(surrounding_turfs), BS.move_to_delay)
 	return
 
-/mob/camera/blob/verb/telepathy_power()
+/mob/camera/blob/verb/telepathy(message as text)
 	set category = "Blob"
-	set name = "Psionic Message"
+	set name = "Psionic Message (15)"
 	set desc = "Give a psionic message to all creatures on and around the station."
-	telepathy()
-
-/mob/camera/blob/proc/telepathy(message as text)
-
-	if(!can_buy(BLOBTAUNTCOST))
-		return
-
 
 	to_chat(world, "<span class='warning'>Your vision becomes cloudy, and your mind becomes clear.</span>")
 	spawn(5)
 	to_chat(world, "<span class='blob'>[message]</span>")
-	add_gamelogs(src, "used blob telepathy to convey \"[message]\"", tp_link = TRUE)
 	log_blobtelepathy("[key_name(usr)]: [message]")

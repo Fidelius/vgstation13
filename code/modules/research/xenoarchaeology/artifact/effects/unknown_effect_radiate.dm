@@ -2,7 +2,6 @@
 /datum/artifact_effect/radiate
 	effecttype = "radiate"
 	var/radiation_amount
-	copy_for_battery = list("radiation_amount")
 
 /datum/artifact_effect/radiate/New()
 	..()

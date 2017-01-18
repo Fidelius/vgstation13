@@ -76,14 +76,10 @@ emp_act
 /mob/living/carbon/human/proc/check_body_part_coverage(var/body_part_flags=0)
 	if(!body_part_flags)
 		return 0
-	var/parts_to_check = body_part_flags
 	for(var/obj/item/clothing/C in get_clothing_items())
 		if(!C)
 			continue
-		if((C.body_parts_covered & body_part_flags) == body_part_flags)
-			return 1
-		parts_to_check &= ~(C.body_parts_covered)
-		if(!parts_to_check)
+		if(C.body_parts_covered & body_part_flags)
 			return 1
 	return 0
 
@@ -208,10 +204,10 @@ emp_act
 			affecting.sabotaged = 1
 		return 0
 
-	if(istype(I.attack_verb, /list) && I.attack_verb.len && !(I.flags & NO_ATTACK_MSG))
+	if(istype(I.attack_verb, /list) && I.attack_verb.len)
 		visible_message("<span class='danger'>[user] [pick(I.attack_verb)] [src] in the [hit_area] with \the [I.name]!</span>", \
 			"<span class='userdanger'>[user] [pick(I.attack_verb)] you in the [hit_area] with \the [I.name]!</span>")
-	else if(!(I.flags & NO_ATTACK_MSG))
+	else
 		visible_message("<span class='danger'>[user] attacks [src] in the [hit_area] with \the [I.name]!</span>", \
 			"<span class='userdanger'>[user] attacks you in the [hit_area] with \the [I.name]!</span>")
 
@@ -240,7 +236,7 @@ emp_act
 				if(prob(chance))
 					knock_out_teeth(user)
 
-	apply_damage(I.force, I.damtype, affecting, armor , I.is_sharp(), used_weapon = I)
+	apply_damage(I.force, I.damtype, affecting, armor , I.is_sharp(), I)
 
 	var/bloody = 0
 	if(((I.damtype == BRUTE) || (I.damtype == HALLOSS)) && prob(25 + (I.force * 2)))

@@ -1,1 +1,0 @@
-#define EMBED_THROWING_SPEED 20

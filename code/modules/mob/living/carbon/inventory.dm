@@ -10,8 +10,9 @@
 			return legcuffed
 	return null
 
-/mob/living/carbon/u_equip(obj/item/W as obj, dropped = 1, var/slot = null)
+/mob/living/carbon/u_equip(obj/item/W as obj, dropped = 1)
 	var/success = 0
+	var/slot = null
 	if(!W)
 		return 0
 	else if (W == handcuffed)

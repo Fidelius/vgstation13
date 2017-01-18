@@ -89,7 +89,7 @@
 
 /obj/structure/conveyor_assembly
 	name = "conveyor belt assembly"
-	desc = "At last, your very own baggage claim."
+	desc = "These are the thingies that make the loop go round."
 	icon = 'icons/obj/recycling.dmi'
 	icon_state = "conveyor-assembly"
 	density = 0
@@ -102,7 +102,7 @@
 
 /obj/structure/conveyor_assembly/examine(mob/user)
 	..()
-	to_chat(user, "<span class='info'>It needs some metal sheets applied as plating.</span>")
+	to_chat(user, "<span class='info'>It needs some plates applied as sheeting.</span>")
 
 /obj/structure/conveyor_assembly/attackby(obj/item/P, mob/user)
 	if(iscrowbar(P))

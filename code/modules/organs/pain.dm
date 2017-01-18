@@ -8,9 +8,15 @@ mob/var/next_pain_time = 0
 // partname is the name of a body part
 // amount is a num from 1 to 100
 mob/living/carbon/proc/pain(var/partname, var/amount, var/force, var/burning = 0)
-	if(stat >= 2 || sleeping)
+	if(stat >= 2)
 		return
-	if(!feels_pain() || has_painkillers())
+	if(reagents.has_reagent(PARACETAMOL))
+		return
+	if(reagents.has_reagent(TRAMADOL))
+		return
+	if(reagents.has_reagent(OXYCODONE))
+		return
+	if(analgesic)
 		return
 	if(world.time < next_pain_time && !force)
 		return
@@ -49,9 +55,15 @@ mob/living/carbon/human/proc/custom_pain(var/message, var/flash_strength)
 	if(stat >= 1)
 		return
 
-	if(!feels_pain() || has_painkillers())
+	if(!feels_pain())
 		return
 
+	if(reagents.has_reagent(TRAMADOL))
+		return
+	if(reagents.has_reagent(OXYCODONE))
+		return
+	if(analgesic)
+		return
 	var/msg = "<span class='danger'>[message]</span>"
 	if(flash_strength >= 1)
 		msg = "<span class='danger'><font size=3>[message]</font></span>"
@@ -63,25 +75,27 @@ mob/living/carbon/human/proc/custom_pain(var/message, var/flash_strength)
 	next_pain_time = world.time + 100
 
 mob/living/carbon/human/proc/handle_pain()
-	if(sleeping || stat == DEAD)
-		return
-	if(!feels_pain() || has_painkillers())
+	// not when sleeping
+
+	if(!feels_pain())
 		return
 
+	if(stat >= 2)
+		return
+	if(reagents.has_reagent(TRAMADOL))
+		return
+	if(reagents.has_reagent(OXYCODONE))
+		return
+	if(analgesic)
+		return
 	var/maxdam = 0
 	var/datum/organ/external/damaged_organ = null
 	for(var/datum/organ/external/E in organs)
-		if(E.status & ORGAN_DEAD || E.status & ORGAN_PEG)
+		// amputated limbs don't cause pain
+		if(E.amputated)
 			continue
-		// CLEANLY amputated limbs don't cause pain
-		else if(E.amputated)
+		if(E.status & ORGAN_DEAD)
 			continue
-		// your shredded nub of a fuckin' arm DOES, though
-		else if (!E.is_existing())
-			if(prob(2))
-				custom_pain("The mangled stump of your [E.display_name] hurts badly!", 1)
-			continue
-
 		var/dam = E.get_damage()
 		// make the choice of the organ depend on damage,
 		// but also sometimes use one of the less damaged ones
@@ -96,7 +110,7 @@ mob/living/carbon/human/proc/handle_pain()
 		if(I.damage > 2)
 			if(prob(2))
 				var/datum/organ/external/parent = get_organ(I.parent_organ)
-				custom_pain("You feel a sharp pain in your [parent.display_name]", 1)
+				src.custom_pain("You feel a sharp pain in your [parent.display_name]", 1)
 
 	var/toxDamageMessage = null
 	var/toxMessageProb = 1

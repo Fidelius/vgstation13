@@ -521,7 +521,7 @@
 
 /obj/item/weapon/reagent_containers/food/snacks/grown/pumpkin/attackby(obj/item/weapon/W as obj, mob/user as mob)
 	..()
-	if(W.sharpness_flags & SHARP_BLADE)
+	if(W.is_sharp() >= 1)
 		user.visible_message("<span class='notice'>[user] carves a face into \the [src] with \the [W]!</span>", "<span class='notice'>You carve a face into \the [src] with \the [W]!</span>")
 		new /obj/item/clothing/head/pumpkinhead(get_turf(src)) //Don't move it
 		qdel(src)
@@ -678,22 +678,6 @@
 	potency = 20
 	filling_color = "#66CEED"
 	plantname = "icechili"
-
-/obj/item/weapon/reagent_containers/food/snacks/grown/ghostpepper
-	name = "ghost pepper"
-	desc = "This pepper is hainted. And pretty spicy, too."
-	icon_state = "ghostpepper"
-	potency = 20
-	filling_color = "#66CEED"
-	plantname = "ghostpepper"
-
-/obj/item/weapon/reagent_containers/food/snacks/grown/ghostpepper/spook()
-	visible_message("<span class='warning'>A specter takes a bite of \the [src] from beyond the grave!</span>")
-	playsound(get_turf(src),'sound/items/eatfood.ogg', rand(10,50), 1)
-	bitecount++
-	reagents.remove_any(bitesize)
-	if(!reagents.total_volume)
-		qdel(src)
 
 /obj/item/weapon/reagent_containers/food/snacks/grown/carrot
 	name = "carrot"

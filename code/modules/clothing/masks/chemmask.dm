@@ -27,7 +27,7 @@
 	desc = "A rather sinister mask designed for connection to a chemical pack, providing the pack's safeties are disabled."
 	name = "chemical mask"
 	icon_state = "chemmask0"
-	clothing_flags = MASKINTERNALS
+	flags = FPRINT | MASKINTERNALS
 	w_class = W_CLASS_SMALL
 	var/power = 0
 	gas_transfer_coefficient = 0.01

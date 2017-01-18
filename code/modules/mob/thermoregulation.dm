@@ -15,7 +15,7 @@
 	if(forceburn && ticker && ticker.hardcore_mode)
 		forceburn = 0
 	if(nutrition - amount > 0 || forceburn)
-		var/heatmodifier = 0.7 * (100 / BODYTEMP_COLD_DIVISOR)
+		var/heatmodifier = 0.7
 		nutrition = max(nutrition - amount,0)
 		if((M_FAT in mutations))
 			heatmodifier = heatmodifier*2
@@ -39,7 +39,7 @@
 	/* buggy as fug
 	if(istype(src,/mob/living/carbon/human))
 		var/mob/living/carbon/human/H = src
-		if(!H.species.anatomy_flags & HAS_SWEAT_GLANDS)
+		if(!H.species.has_sweat_glands)
 			return 1
 
 	*/
@@ -140,3 +140,4 @@
 	else
 		loc_temp = environment.temperature
 	return loc_temp
+

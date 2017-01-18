@@ -25,8 +25,6 @@
 	var/time_coeff = 1 //Upgraded via part upgrading
 	var/resource_efficiency = 1
 	var/id_tag = "clone_pod"
-	var/obj/machinery/computer/cloning/cloning_computer = null
-
 
 	machine_flags = EMAGGABLE | SCREWTOGGLE | CROWDESTROY | MULTITOOL_MENU
 
@@ -83,12 +81,7 @@
 
 /obj/item/weapon/disk/data/New()
 	for(var/i=1;i<=DNA_SE_LENGTH;i++)
-		labels[i] = getFromPool(/datum/block_label)
-
-/obj/item/weapon/disk/data/Destroy()
-	for(var/datum/block_label/label in labels)
-		returnToPool(label)
-	..()
+		labels[i] = new /datum/block_label
 
 /obj/item/weapon/disk/data/proc/Initialize()
 	buf = new
@@ -361,10 +354,7 @@
 	return..()
 
 /obj/machinery/cloning/clonepod/Destroy()
-	if(connected)
-		if(connected.pod1 == src)
-			connected.pod1 = null
-		connected = null
+
 	go_out() //Eject everything
 
 	. = ..()

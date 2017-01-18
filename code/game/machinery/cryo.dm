@@ -259,7 +259,7 @@ var/global/list/cryo_health_indicator = list(	"full" = image("icon" = 'icons/obj
 	data["beakerLabel"] = null
 	data["beakerVolume"] = 0
 	if(beaker)
-		data["beakerLabel"] = beaker.labeled ? beaker.labeled : null
+		data["beakerLabel"] = beaker.label_text ? beaker.label_text : null
 		if (beaker.reagents && beaker.reagents.reagent_list.len)
 			for(var/datum/reagent/R in beaker.reagents.reagent_list)
 				data["beakerVolume"] += R.volume
@@ -312,8 +312,11 @@ var/global/list/cryo_health_indicator = list(	"full" = image("icon" = 'icons/obj
 	if(beaker)
 		beaker.forceMove(get_step(loc, SOUTH))
 		if(istype(beaker, /obj/item/weapon/reagent_containers/glass/beaker/large/cyborg))
-			var/obj/item/weapon/reagent_containers/glass/beaker/large/cyborg/borgbeak = beaker
-			borgbeak.return_to_modules()
+			var/mob/living/silicon/robot/R = beaker:holder:loc
+			if(R.module_state_1 == beaker || R.module_state_2 == beaker || R.module_state_3 == beaker)
+				beaker.forceMove(R)
+			else
+				beaker.forceMove(beaker:holder)
 		beaker = null
 
 /obj/machinery/atmospherics/unary/cryo_cell/crowbarDestroy(mob/user)
@@ -331,9 +334,6 @@ var/global/list/cryo_health_indicator = list(	"full" = image("icon" = 'icons/obj
 	if(istype(G, /obj/item/weapon/reagent_containers/glass))
 		if(beaker)
 			to_chat(user, "<span class='warning'>A beaker is already loaded into the machine.</span>")
-			return
-		if(G.w_class > W_CLASS_SMALL)
-			to_chat(user, "<span class='warning'>\The [G] is too big to fit.</span>")
 			return
 		if(user.drop_item(G, src))
 			beaker =  G

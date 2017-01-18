@@ -12,28 +12,25 @@
 	if(!damage || (blocked >= 2))
 		return 0
 
-	var/damage_done = damage/(blocked+1)
-
 	switch(damagetype)
 		if(BRUTE)
-			adjustBruteLoss(damage_done)
+			adjustBruteLoss(damage/(blocked+1))
 		if(BURN)
 			if(M_RESIST_HEAT in mutations)
-				damage_done = 0
-			adjustFireLoss(damage_done)
+				damage = 0
+			adjustFireLoss(damage/(blocked+1))
 		if(TOX)
-			adjustToxLoss(damage_done)
+			adjustToxLoss(damage/(blocked+1))
 		if(OXY)
-			adjustOxyLoss(damage_done)
+			adjustOxyLoss(damage/(blocked+1))
 		if(CLONE)
-			adjustCloneLoss(damage_done)
+			adjustCloneLoss(damage/(blocked+1))
 		if(HALLOSS)
-			adjustHalLoss(damage_done)
+			adjustHalLoss(damage/(blocked+1))
 		if(BRAIN)
-			adjustBrainLoss(damage_done)
+			adjustBrainLoss(damage/(blocked+1))
 	updatehealth()
-
-	return damage_done
+	return 1
 
 
 /mob/living/proc/apply_damages(var/brute = 0, var/burn = 0, var/tox = 0, var/oxy = 0, var/clone = 0, var/halloss = 0, var/def_zone = null, var/blocked = 0)

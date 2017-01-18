@@ -1,7 +1,6 @@
 /mob/living/simple_animal/mouse
 	name = "mouse"
 	real_name = "mouse"
-	var/namenumbers = TRUE
 	desc = "It's a small, disease-ridden rodent."
 	icon_state = "mouse_gray"
 	icon_living = "mouse_gray"
@@ -29,7 +28,6 @@
 
 	size = SIZE_TINY
 	holder_type = /obj/item/weapon/holder/animal/mouse
-	held_items = list()
 
 /mob/living/simple_animal/mouse/Life()
 	if(timestopped)
@@ -58,7 +56,7 @@
 	if(config && config.uneducated_mice)
 		universal_understand = 0
 	// Mice IDs
-	if(namenumbers)
+	if(name == initial(name))
 		name = "[name] ([rand(1, 1000)])"
 	real_name = name
 	if(!_color)
@@ -137,6 +135,8 @@
 ///mob/living/simple_animal/mouse/restrained() //Hotfix to stop mice from doing things with MouseDrop
 //	return 1
 
+/mob/living/simple_animal/mouse/start_pulling(var/atom/movable/AM)//Prevents mouse from pulling things
+	to_chat(src, "<span class='warning'>You are too small to pull anything.</span>")
 
 /mob/living/simple_animal/mouse/Crossed(AM as mob|obj)
 	if( ishuman(AM) )
@@ -174,7 +174,6 @@
 //TOM IS ALIVE! SQUEEEEEEEE~K :)
 /mob/living/simple_animal/mouse/brown/Tom
 	name = "Tom"
-	namenumbers = FALSE
 	desc = "Jerry the cat is not amused."
 	response_help  = "pets"
 	response_disarm = "gently pushes aside"
@@ -182,7 +181,6 @@
 
 /mob/living/simple_animal/mouse/black/dessert
 	name = "Dessert"
-	namenumbers = FALSE
 	desc = "Crunchy!"
 	response_help  = "pets"
 	response_disarm = "gently pushes aside"

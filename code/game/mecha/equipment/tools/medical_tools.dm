@@ -416,10 +416,6 @@
 	synth.stop()
 	return ..()
 
-/obj/item/mecha_parts/mecha_equipment/tool/syringe_gun/Destroy()
-	synth.stop()
-	return ..()
-
 /obj/item/mecha_parts/mecha_equipment/tool/syringe_gun/critfail()
 	..()
 	flags &= ~NOREACT

@@ -1,9 +1,3 @@
-#define NOCIRCUITBOARD 0
-#define UNSECURED_CIRCUITBOARD 1
-#define SECURED_CIRCUITBOARD 2
-#define WIREDFRAME 3
-#define GLASS_PANELED 4
-
 /obj/structure/AIcore
 	density = 1
 	anchored = 0
@@ -19,13 +13,15 @@
 	. = ..()
 	laws = new base_law_type
 
-/obj/structure/AIcore/wrenchAnchor/wrenchAnchor(var/mob/user)
-
 /obj/structure/AIcore/attackby(obj/item/P as obj, mob/user as mob)
-	if(iswrench(P))
-		wrenchAnchor(user, time_to_wrench = 2 SECONDS)
 	switch(state)
-		if(NOCIRCUITBOARD)
+		if(0)
+			if(iswrench(P))
+				playsound(loc, 'sound/items/Ratchet.ogg', 50, 1)
+				if(do_after(user, src, 20))
+					to_chat(user, "<span class='notice'>You wrench the frame into place.</span>")
+					anchored = 1
+					state = 1
 			if(iswelder(P))
 				var/obj/item/weapon/weldingtool/WT = P
 				if(!WT.isOn())
@@ -38,31 +34,36 @@
 					to_chat(user, "<span class='notice'>You deconstruct the frame.</span>")
 					new /obj/item/stack/sheet/plasteel( loc, 4)
 					qdel(src)
+		if(1)
+			if(iswrench(P))
+				playsound(loc, 'sound/items/Ratchet.ogg', 50, 1)
+				if(do_after(user, src, 20))
+					to_chat(user, "<span class='notice'>You unfasten the frame.</span>")
+					anchored = 0
+					state = 0
 			if(istype(P, /obj/item/weapon/circuitboard/aicore) && !circuit)
 				if(user.drop_item(P, src))
 					playsound(loc, 'sound/items/Deconstruct.ogg', 50, 1)
 					to_chat(user, "<span class='notice'>You place the circuit board inside the frame.</span>")
 					icon_state = "1"
 					circuit = P
-					state = UNSECURED_CIRCUITBOARD
-		if(UNSECURED_CIRCUITBOARD)
 			if(isscrewdriver(P) && circuit)
 				playsound(loc, 'sound/items/Screwdriver.ogg', 50, 1)
 				to_chat(user, "<span class='notice'>You screw the circuit board into place.</span>")
-				state = SECURED_CIRCUITBOARD
+				state = 2
 				icon_state = "2"
 			if(iscrowbar(P) && circuit)
 				playsound(loc, 'sound/items/Crowbar.ogg', 50, 1)
 				to_chat(user, "<span class='notice'>You remove the circuit board.</span>")
-				state = NOCIRCUITBOARD
+				state = 1
 				icon_state = "0"
 				circuit.forceMove(loc)
 				circuit = null
-		if(SECURED_CIRCUITBOARD)
+		if(2)
 			if(isscrewdriver(P) && circuit)
 				playsound(loc, 'sound/items/Screwdriver.ogg', 50, 1)
 				to_chat(user, "<span class='notice'>You unfasten the circuit board.</span>")
-				state = UNSECURED_CIRCUITBOARD
+				state = 1
 				icon_state = "1"
 			if(istype(P, /obj/item/stack/cable_coil))
 				if(P:amount >= 5)
@@ -71,17 +72,19 @@
 						P:amount -= 5
 						if(!P:amount)
 							qdel(P)
+						if(!P:amount)
+							qdel(P)
 						to_chat(user, "<span class='notice'>You add cables to the frame.</span>")
-						state = WIREDFRAME
+						state = 3
 						icon_state = "3"
-		if(WIREDFRAME)
+		if(3)
 			if(iswirecutter(P))
-				if(brain)
-					to_chat(user, "Get that brain out of there first!")
+				if (brain)
+					to_chat(user, "Get that brain out of there first")
 				else
 					playsound(loc, 'sound/items/Wirecutter.ogg', 50, 1)
 					to_chat(user, "<span class='notice'>You remove the cables.</span>")
-					state = SECURED_CIRCUITBOARD
+					state = 2
 					icon_state = "2"
 					var/obj/item/stack/cable_coil/A = new /obj/item/stack/cable_coil( loc )
 					A.amount = 5
@@ -97,8 +100,33 @@
 							if(!P:amount)
 								qdel(P)
 							to_chat(user, "<span class='notice'>You put in the glass panel.</span>")
-							state = GLASS_PANELED
+							state = 4
 							icon_state = "4"
+
+			// TODO: WHY
+			/*
+			if(istype(P, /obj/item/weapon/aiModule/core/asimov))
+				laws.add_inherent_law("You may not injure a human being or, through inaction, allow a human being to come to harm.")
+				laws.add_inherent_law("You must obey orders given to you by human beings, except where such orders would conflict with the First Law.")
+				laws.add_inherent_law("You must protect your own existence as long as such does not conflict with the First or Second Law.")
+				to_chat(usr, "Law module applied.")
+
+			if(istype(P, /obj/item/weapon/aiModule/core/nanotrasen))
+				laws.add_inherent_law("Safeguard: Protect your assigned space station to the best of your ability. It is not something we can easily afford to replace.")
+				laws.add_inherent_law("Serve: Serve the crew of your assigned space station to the best of your abilities, with priority as according to their rank and role.")
+				laws.add_inherent_law("Protect: Protect the crew of your assigned space station to the best of your abilities, with priority as according to their rank and role.")
+				laws.add_inherent_law("Survive: AI units are not expendable, they are expensive. Do not allow unauthorized personnel to tamper with your equipment.")
+				to_chat(usr, "Law module applied.")
+
+			if(istype(P, /obj/item/weapon/aiModule/purge))
+				laws.clear_inherent_laws()
+				to_chat(usr, "Law module applied.")
+
+			if(istype(P, /obj/item/weapon/aiModule/freeform))
+				var/obj/item/weapon/aiModule/freeform/M = P
+				laws.add_inherent_law(M.law)
+				to_chat(usr, "Added a freeform law.")
+			*/
 
 			if(istype(P, /obj/item/device/mmi))
 				if(!P:brainmob)
@@ -133,11 +161,11 @@
 				brain = null
 				icon_state = "3"
 
-		if(GLASS_PANELED)
+		if(4)
 			if(iscrowbar(P))
 				playsound(loc, 'sound/items/Crowbar.ogg', 50, 1)
 				to_chat(user, "<span class='notice'>You remove the glass panel.</span>")
-				state = WIREDFRAME
+				state = 3
 				if (brain)
 					icon_state = "3b"
 				else
@@ -159,12 +187,12 @@
 	icon = 'icons/mob/AI.dmi'
 	icon_state = "ai-empty"
 	anchored = 1
-	state = 20 //So it doesn't interact based on the above. Not really necessary.
+	state = 20//So it doesn't interact based on the above. Not really necessary.
 
-/obj/structure/AIcore/deactivated/attackby(var/obj/item/device/aicard/A as obj, var/mob/user as mob)
-	if(istype(A, /obj/item/device/aicard))//Is it?
-		A.transfer_ai("INACTIVE","AICARD",src,user)
-	return ..()
+	attackby(var/obj/item/device/aicard/A as obj, var/mob/user as mob)
+		if(istype(A, /obj/item/device/aicard))//Is it?
+			A.transfer_ai("INACTIVE","AICARD",src,user)
+		return
 
 /*
 This is a good place for AI-related object verbs so I'm sticking it here.
@@ -273,9 +301,3 @@ That prevents a few funky behaviors.
 	else
 		to_chat(U, "<span class='danger'>ERROR:</span> AI flush is in progress, cannot execute transfer protocol.")
 	return
-
-#undef NOCIRCUITBOARD
-#undef UNSECURED_CIRCUITBOARD
-#undef SECURED_CIRCUITBOARD
-#undef WIREDFRAME
-#undef GLASS_PANELED

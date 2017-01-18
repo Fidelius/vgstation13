@@ -307,15 +307,15 @@
 			else
 				text += "<br><font color='red'><B>The wizard has failed!</B></font>"
 				feedback_add_details("wizard_success","FAIL")
-			if(wizard.wizard_spells && wizard.wizard_spells.len)
+			if(wizard.current && wizard.current.spell_list)
 				text += "<br><B>[wizard.name] used the following spells: </B>"
 				var/i = 1
-				for(var/spell/S in wizard.wizard_spells)
+				for(var/spell/S in wizard.current.spell_list)
 					var/icon/spellicon = icon('icons/mob/screen_spells.dmi', S.hud_state)
 					end_icons += spellicon
 					tempstate = end_icons.len
 					text += {"<br><img src="logo_[tempstate].png"> [S.name][S.get_scoreboard_suffix()]"}
-					if(wizard.wizard_spells.len > i)
+					if(wizard.current.spell_list.len > i)
 						text += ", "
 					i++
 			text += "<br>"
@@ -367,15 +367,15 @@
 			else
 				text += "<br><font color='red'><B>The apprentice has failed!</B></font>"
 				feedback_add_details("wizard_success","FAIL")
-			if(apprentice.wizard_spells && apprentice.wizard_spells.len)
+			if(apprentice.current && apprentice.current.spell_list)
 				text += "<br><B>[apprentice.name] used the following spells: </B>"
 				var/i = 1
-				for(var/spell/S in apprentice.wizard_spells)
+				for(var/spell/S in apprentice.current.spell_list)
 					var/icon/spellicon = icon('icons/mob/screen_spells.dmi', S.hud_state)
 					end_icons += spellicon
 					tempstate = end_icons.len
 					text += {"<br><img src="logo_[tempstate].png"> [S.name]"}
-					if(apprentice.wizard_spells.len > i)
+					if(apprentice.current.spell_list.len > i)
 						text += ", "
 					i++
 			text += "<br>"
